@@ -1,6 +1,5 @@
 import abc
 from shfl.core.node import DataNode
-import copy
 
 
 class FederatedData:
@@ -122,13 +121,12 @@ def federate_array(identifier, array, num_data_nodes):
     ~FederatedData
         FederatedData with an array of size len(array)/num_data_nodes in every node.
     """
-    array_copy = copy.deepcopy(array)
     split_size = len(array) / float(num_data_nodes)
     last = 0.0
 
     federated_array = FederatedData(identifier)
     while last < len(array):
-        federated_array.add_data_node(DataNode(), array_copy[int(last):int(last + split_size)])
+        federated_array.add_data_node(DataNode(), array[int(last):int(last + split_size)])
         last = last + split_size
 
     return federated_array

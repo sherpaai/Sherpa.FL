@@ -1,3 +1,6 @@
+import copy
+
+
 class DataNode:
     """
     This class represents an independent data node
@@ -22,7 +25,7 @@ class DataNode:
         print(self._private_data)
 
     def set_private_data(self, name, data):
-        self._private_data[name] = data
+        self._private_data[name] = copy.deepcopy(data)
 
     def apply_data_transformation(self, private_property, federated_transformation):
         federated_transformation.apply(self._private_data[private_property])

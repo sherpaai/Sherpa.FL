@@ -52,7 +52,7 @@ def test_train_model_data():
     data_node.model = model_mock
     data_node.set_private_data("random_array", labeled_data)
     data_node.train_model("random_array")
-    model_mock.train.assert_called_once_with(random_array, random_array_labels)
+    model_mock.train.assert_called_once()
 
 
 def test_get_model():
@@ -69,6 +69,7 @@ def test_predict():
     data_node.model = model_mock
     data_node.predict(random_array)
     model_mock.predict.assert_called_once_with(random_array)
+
 
 def test_set_params():
     random_array = np.random.rand(30)
