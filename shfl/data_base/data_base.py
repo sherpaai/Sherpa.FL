@@ -28,8 +28,8 @@ def extract_validation_samples(data, labels, dim):
     validation_data = data[0:dim, ]
     validation_labels = labels[0:dim]
 
-    rest_data = data[dim:-1, ]
-    rest_labels = labels[dim:-1]
+    rest_data = data[dim:, ]
+    rest_labels = labels[dim:]
 
     return rest_data, rest_labels, validation_data, validation_labels
 
