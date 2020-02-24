@@ -4,6 +4,7 @@ import random
 
 from shfl.data_base.data_base import DataBase
 from shfl.data_distribution.data_distribution_non_iid import NonIidDataDistribution,choose_labels
+from shfl.core.query import Get
 
 
 class TestDataBase(DataBase):
@@ -72,5 +73,53 @@ def test_make_data_federated():
     assert num_nodes == federated_data.shape[0] == federated_label.shape[0]
     assert (np.sort(all_data.ravel()) == np.sort(train_data[idx,].ravel())).all()
     assert (np.sort(all_label) == np.sort(train_label[idx])).all()
+
+def test_get_federated_data():
+    random.seed(123)
+    np.random.seed(123)
+
+    data = TestDataBase()
+    data.load_data()
+
+    dt = NonIidDataDistribution(data)
+
+    # Identifier and num nodes is checked in core test.
+    # Percent and weight is checked in idd and no_idd test.
+    # So here, we only test mistaken param.
+    mistaken = 50
+    num_nodes = 4
+    federated_data, test_data, test_label = dt.get_federated_data("id001", num_nodes, mistaken=mistaken)
+
+    X_c = []
+    y_c = []
+    for i in range(federated_data.num_nodes()):
+        X_c.append(federated_data[i].query_private_data(Get(), "id001").data)
+        y_c.append(federated_data[i].query_private_data(Get(), "id001").label)
+
+    X_c = np.array(X_c)
+    y_c = np.array(y_c)
+
+    train_data, train_labels = dt._database.train
+    validation_data, validation_labels = dt._database.validation
+
+    X = np.concatenate([train_data, validation_data], axis=0)
+    y = np.concatenate([train_labels, validation_labels], axis=0)
+
+    num_mistaken = 0
+    idx = []
+    for i,node in enumerate(X_c):
+        labels_node = []
+        for data in node:
+            assert data in X
+            idx.append(np.where((data==X).all(axis=1))[0][0])
+            labels_node.append(y[idx[-1]])
+        if not (labels_node == y_c[i]).all():
+            num_mistaken = num_mistaken + 1
+
+    assert np.array_equal(X[idx,].ravel(), np.concatenate(X_c).ravel())
+    assert np.array_equal(test_data.ravel(), dt._database.test[0].ravel())
+    assert np.array_equal(test_label, dt._database.test[1])
+    assert num_mistaken / num_nodes * 100 == mistaken
+    assert num_mistaken / num_nodes * 100 > 0
 
 
