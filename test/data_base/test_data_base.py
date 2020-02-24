@@ -68,11 +68,15 @@ def test_data_base_shuffle_correct():
     data = TestDataBase()
     data.load_data()
 
-    train_data_b, train_labels_b, validation_data_b, validation_labels_b, test_data_b, test_labels_b = data.data
+    train_data_b, train_labels_b = data.train
+    test_data_b, test_labels_b = data.test
+    validation_data_b, validation_labels_b = data.validation
 
     data.shuffle()
 
-    train_data_a, train_labels_a, validation_data_a, validation_labels_a, test_data_a, test_labels_a = data.data
+    train_data_a, train_labels_a = data.train
+    test_data_a, test_labels_a = data.test
+    validation_data_a, validation_labels_a = data.validation
 
     assert (train_data_b == train_data_a).all() == False
     assert (validation_data_b == validation_data_a).all() == False
