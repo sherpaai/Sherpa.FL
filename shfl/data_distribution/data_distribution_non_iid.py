@@ -79,6 +79,8 @@ class NonIidDataDistribution(DataDistribution):
         if weights is None:
             weights = np.full(num_nodes, 1/num_nodes)
 
+        weights = np.array([float(i) / sum(weights) for i in weights])
+
         federated_data = []
         federated_label = []
 
