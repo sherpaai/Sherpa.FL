@@ -9,7 +9,7 @@ class FederatedAggregator(abc.ABC):
     Attributes
     ---------
     percentage : float
-        Percentage of data to use
+        Percentage of total data for each client
     accuracy_models : array
         Accuracy for each model
     """

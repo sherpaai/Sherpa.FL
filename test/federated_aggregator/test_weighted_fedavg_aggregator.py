@@ -1,7 +1,7 @@
 import numpy as np
 import pytest
 
-from shfl.federated_aggregator.fsvrg_aggregator import AvgFedAggregator
+from shfl.federated_aggregator.weighted_avgfed_aggregator import WeightedAvgFedAggregator
 
 def test_aggregated_weights():
     num_clients = 10
@@ -14,19 +14,15 @@ def test_aggregated_weights():
 
     clients_params = np.array(weights)
 
-    avgfa = AvgFedAggregator()
+    percentage = np.random.dirichlet(np.ones(num_clients),size=1)[0]
+
+    avgfa = WeightedAvgFedAggregator(percentage=percentage)
     aggregated_weights = avgfa.aggregate_weights(clients_params)
 
-    own_agg = np.array([np.mean(clients_params[:, layer], axis=0) for layer in range(num_layers)])
+    own_ponderated_weights = np.array([percentage[client] * clients_params[client, :] for client in range(num_clients)])
+    own_agg = np.array([np.sum(own_ponderated_weights[:, layer], axis=0) for layer in range(num_layers)])
 
     for i in range(num_layers):
         assert np.array_equal(own_agg[i],aggregated_weights[i])
     assert aggregated_weights.shape[0] == num_layers
-
-
-
-
-
-
-
 
