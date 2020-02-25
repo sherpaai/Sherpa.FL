@@ -40,6 +40,8 @@ class IidDataDistribution(DataDistribution):
         if weights is None:
             weights = np.full(num_nodes, 1/num_nodes)
 
+        weights = np.array([float(i)/sum(weights) for i in weights])
+
         # Shuffle data
         randomize = np.arange(len(labels))
         np.random.shuffle(randomize)
