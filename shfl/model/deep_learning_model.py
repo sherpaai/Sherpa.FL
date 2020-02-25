@@ -43,6 +43,3 @@ class KerasDeepLearningModel(DeepLearningModel):
 
     def set_model_params(self, params):
         self._model.set_weights(params)
-
-
-
