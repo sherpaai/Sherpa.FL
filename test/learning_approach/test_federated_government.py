@@ -33,7 +33,7 @@ def test_get_global_model_accuracy():
     fdg = FederatedGovernment(model_builder, federated_data, aggregator)
     fdg._model.predict.return_value = np.random.randint(0, 10, 40)
 
-    fdg.get_global_model_accuracy(test_data,test_labels)
+    fdg.get_global_model_accuracy(test_data, test_labels)
     fdg._model.predict.assert_called_once_with(test_data)
 
 
@@ -109,12 +109,13 @@ def test_aggregate_weights():
 
     fdg = FederatedGovernment(model_builder, federated_data, aggregator)
 
-    weights = np.random.rand(64,32)
+    weights = np.random.rand(64, 32)
     fdg._aggregator.aggregate_weights.return_value = weights
 
     fdg.aggregate_weights()
 
     fdg._model.set_model_params.assert_called_once_with(weights)
+
 
 def test_run_rounds():
     model_builder = Mock
