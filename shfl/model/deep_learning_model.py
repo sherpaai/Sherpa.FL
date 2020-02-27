@@ -1,23 +1,16 @@
-from abc import ABC
 from keras.callbacks import EarlyStopping
-import tensorflow as tf
-import numpy as np
-
 from shfl.model.model import TrainableModel
 
 
-class DeepLearningModel(TrainableModel, ABC):
+class DeepLearningModel(TrainableModel):
 
     def __init__(self, model, batch_size=None, epochs=1):
         self._model = model
-        self._data_shape = model.layers[0].input_shape[1:]
-        self._label_shape = model.layers[-1].output_shape[1:]
+        self._data_shape = model.layers[0].get_input_shape_at(0)[1:]
+        self._label_shape = model.layers[-1].get_output_shape_at(0)[1:]
 
         self._batch_size = batch_size
         self._epochs = epochs
-
-
-class KerasDeepLearningModel(DeepLearningModel):
 
     def train(self, data, label):
         if data.shape[1:] != self._data_shape:

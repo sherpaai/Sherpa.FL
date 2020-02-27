@@ -2,7 +2,7 @@ import numpy as np
 from unittest.mock import Mock
 import pytest
 
-from shfl.model.deep_learning_model import DeepLearningModel, KerasDeepLearningModel
+from shfl.model.deep_learning_model import DeepLearningModel
 
 
 class TestDeepLearningModel(DeepLearningModel):
@@ -26,9 +26,9 @@ def test_deep_learning_model_private_data():
     sizes = [(30, 64, 64), (64, 10)]
 
     l1 = layer()
-    l1.input_shape = sizes[0]
+    l1.get_input_shape_at.return_value = sizes[0]
     l2 = layer()
-    l2.output_shape = sizes[1]
+    l2.get_output_shape_at.return_value = sizes[1]
     model.layers = [l1, l2]
 
     batch = 32
@@ -49,14 +49,14 @@ def test_train_wrong_data():
     sizes = [(30, 24, 24), (24, 10)]
 
     l1 = layer()
-    l1.input_shape = sizes[0]
+    l1.get_input_shape_at.return_value = sizes[0]
     l2 = layer()
-    l2.output_shape = sizes[1]
+    l2.get_output_shape_at.return_value = sizes[1]
     model.layers = [l1, l2]
 
     batch = 32
     epoch = 2
-    kdpl = KerasDeepLearningModel(model, batch, epoch)
+    kdpl = DeepLearningModel(model, batch, epoch)
 
     num_data = 30
     data = np.array([np.random.rand(16, 16) for i in range(num_data)])
@@ -82,14 +82,14 @@ def test_keras_model_train():
     sizes = [(1, 24, 24), (24, 10)]
 
     l1 = layer()
-    l1.input_shape = sizes[0]
+    l1.get_input_shape_at.return_value = sizes[0]
     l2 = layer()
-    l2.output_shape = sizes[1]
+    l2.get_output_shape_at.return_value = sizes[1]
     model.layers = [l1, l2]
 
     batch = 32
     epoch = 2
-    kdpm = KerasDeepLearningModel(model, batch, epoch)
+    kdpm = DeepLearningModel(model, batch, epoch)
 
     num_data = 30
     data = np.array([np.random.rand(24, 24) for i in range(num_data)])
@@ -115,14 +115,14 @@ def test_predict():
     sizes = [(1, 24, 24), (24, 10)]
 
     l1 = layer()
-    l1.input_shape = sizes[0]
+    l1.get_input_shape_at.return_value = sizes[0]
     l2 = layer()
-    l2.output_shape = sizes[1]
+    l2.get_output_shape_at.return_value = sizes[1]
     model.layers = [l1, l2]
 
     batch = 32
     epoch = 2
-    kdpm = KerasDeepLearningModel(model, batch, epoch)
+    kdpm = DeepLearningModel(model, batch, epoch)
 
     num_data = 30
     data = np.array([np.random.rand(24, 24) for i in range(num_data)])
@@ -139,14 +139,14 @@ def test_wrong_predict():
     sizes = [(1, 24, 24), (24, 10)]
 
     l1 = layer()
-    l1.input_shape = sizes[0]
+    l1.get_input_shape_at.return_value = sizes[0]
     l2 = layer()
-    l2.output_shape = sizes[1]
+    l2.get_output_shape_at.return_value = sizes[1]
     model.layers = [l1, l2]
 
     batch = 32
     epoch = 2
-    kdpm = KerasDeepLearningModel(model, batch, epoch)
+    kdpm = DeepLearningModel(model, batch, epoch)
 
     num_data = 30
     data = np.array([np.random.rand(16, 16) for i in range(num_data)])
@@ -163,14 +163,14 @@ def test_get_model_params():
     sizes = [(1, 24, 24), (24, num_data)]
 
     l1 = layer()
-    l1.input_shape = sizes[0]
+    l1.get_input_shape_at.return_value = sizes[0]
     l2 = layer()
-    l2.output_shape = sizes[1]
+    l2.get_output_shape_at.return_value = sizes[1]
     model.layers = [l1, l2]
 
     batch = 32
     epoch = 2
-    kdpm = KerasDeepLearningModel(model, batch, epoch)
+    kdpm = DeepLearningModel(model, batch, epoch)
 
     params = np.random.rand(30)
     kdpm._model.get_weights.return_value = params
@@ -187,14 +187,14 @@ def test_set_weights():
     sizes = [(1, 24, 24), (24, num_data)]
 
     l1 = layer()
-    l1.input_shape = sizes[0]
+    l1.get_input_shape_at.return_value = sizes[0]
     l2 = layer()
-    l2.output_shape = sizes[1]
+    l2.get_output_shape_at.return_value = sizes[1]
     model.layers = [l1, l2]
 
     batch = 32
     epoch = 2
-    kdpm = KerasDeepLearningModel(model, batch, epoch)
+    kdpm = DeepLearningModel(model, batch, epoch)
 
     params = np.random.rand(30)
     kdpm.set_model_params(params)
