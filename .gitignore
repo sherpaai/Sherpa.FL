@@ -1,6 +1,7 @@
-.DS_Store
+﻿.DS_Store
 .idea/
 *.pyc
 *.ipynb_checkpoints*
 shfl.egg-info/
 .coverage
+.directory
