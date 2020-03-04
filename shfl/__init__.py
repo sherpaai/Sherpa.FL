@@ -8,3 +8,4 @@ from shfl import data_distribution
 from shfl import federated_aggregator
 from shfl import learning_approach
 from shfl import model
+from shfl import differential_privacy

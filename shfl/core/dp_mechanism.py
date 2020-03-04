@@ -61,3 +61,16 @@ class RandomizeBinaryProperty(DifferentialPrivacyMechanism):
             return 0
 
         return 1
+
+
+class LaplaceMechanism(DifferentialPrivacyMechanism):
+    """
+    Implements the Laplace Mechanism for differential privacy
+    """
+    def __init__(self, sensitivity, epsilon):
+        self._sensitivity = sensitivity
+        self._epsilon = epsilon
+
+    def randomize(self, data):
+        b = self._sensitivity/self._epsilon
+        return data + np.random.laplace(loc=0.0, scale=b, size=len(data))
