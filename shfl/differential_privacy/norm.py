@@ -4,26 +4,25 @@ import abc
 
 class SensitivityNorm(abc.ABC):
     """
-    This class computes the sensitivity norm between two values in a normed space
+    This class defines the interface that must be implemented to compute the sensitivity norm between
+    two values in a normed space.
     """
 
     @abc.abstractmethod
     def compute(self, x_1, x_2):
         """
-        Returns the norm of the responses
+        The compute method receives the result of apply a certain function over private data and
+        returns the norm of the responses
 
-        Parameters
-        ----------
-        x_1: array
-            Response from a concrete query over database 1
-        x_2: array
-            Response from the same query over database 2
+        # Arguments:
+            x_1: array response from a concrete query over database 1
+            x_2: array response from the same query over database 2
         """
 
 
 class L1SensitivityNorm(SensitivityNorm):
     """
-    Implements the L1 norm
+    Implements the L1 norm of the difference between x_1 and x_2
     """
     def compute(self, x_1, x_2):
         x = x_1 - x_2

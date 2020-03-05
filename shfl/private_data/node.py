@@ -1,6 +1,6 @@
 import copy
 
-from shfl.core.data import UnprotectedAccess
+from shfl.private_data.data import UnprotectedAccess
 
 
 class DataNode:

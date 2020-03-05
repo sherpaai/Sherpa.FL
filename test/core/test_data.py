@@ -1,8 +1,8 @@
 import numpy as np
 import pytest
 
-from shfl.core.data import LabeledData
-from shfl.core.data import DataAccessDefinition
+from shfl.private_data.data import LabeledData
+from shfl.private_data.data import DataAccessDefinition
 
 
 def test_labeled_data():

@@ -9,32 +9,28 @@ class SensitivitySampler:
     Benjamin I. P. Rubinstein and Francesco Aldà. "Pain-Free Random Differential Privacy with Sensitivity Sampling",
     accepted into the 34th International Conference on Machine Learning (ICML'2017), May 2017.
     It provides a method to estimate the sensitivity of a generic query using a concrete sensitivity norm.
+
+    # References
+        - [Pain-Free Random Differential Privacy with Sensitivity Sampling](
+           https://arxiv.org/pdf/1706.02562.pdf)
     """
-    def sample_sensitivity(self, query, sensitivity_norm, oracle, n=None, m=None, gamma=None):
+    def sample_sensitivity(self, query, sensitivity_norm, oracle, n, m=None, gamma=None):
         """
-        This method calculates the parameters to sample the oracle and estimates the sensitivity
+        This method calculates the parameters to sample the oracle and estimates the sensitivity.
+        One of m or gamma must be provided.
 
-        Parameters
-        ----------
-        query : ~Query
-            Function to apply over private data
-        sensitivity_norm : function
-            Function to compute the sensitivity norm
-        oracle : ~ProbabilityDistribution
-            ProbabilityDistribution to sample.
-        n: int
-            Size of private data
-        m: int
-            Size of sampling
-        gamma: float
-            Privacy confidence level
+        # Arguments
+            query: Function to apply over private data (see: [Query](../../Query))
+            sensitivity_norm: Function to compute the sensitivity norm
+                (see: [Norm](../Norm))
+            oracle: ProbabilityDistribution to sample.
+            n: int for size of private data
+            m: int for size of sampling
+            gamma: float for privacy confidence level
 
-        Return
-        ------
-        sensitivity : float
-            Calculated sensitivity value by the sampler
-        mean : float
-            Mean sensitivity from all samples.
+        # Returns
+            sensitivity: Calculated sensitivity value by the sampler
+            mean: Mean sensitivity from all samples.
         """
         sensitivity_sampler_config = self._sensitivity_sampler_config(m=m, gamma=gamma)
 

@@ -1,0 +1,13 @@
+site_name: Sherpa.FL
+docs_dir: sources
+theme:
+  name: "material"
+plugins:
+  - search
+  - mkdocstrings
+nav:
+  - Home: index.md
+  - Differential Privacy:
+      - Mechanisms: Differential privacy/Mechanisms.md
+      - Sensitivity Sampler: Differential privacy/Sensitivity Sampler.md
+      - Norm: Differential privacy/Norm.md

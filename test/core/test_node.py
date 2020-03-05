@@ -2,10 +2,10 @@ import numpy as np
 from unittest.mock import Mock
 import pytest
 
-from shfl.core.node import DataNode
-from shfl.core.query import IdentityFunction
-from shfl.core.data import LabeledData
-from shfl.core.data import UnprotectedAccess
+from shfl.private_data.node import DataNode
+from shfl.private_data.query import IdentityFunction
+from shfl.private_data.data import LabeledData
+from shfl.private_data.data import UnprotectedAccess
 
 
 def test_private_data():
