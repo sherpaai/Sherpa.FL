@@ -3,5 +3,8 @@
 *.pyc
 *.ipynb_checkpoints*
 shfl.egg-info/
-.coverage
+.coverage*
 .directory
+documentation/sources/*
+documentation/site/*
+venv/*
