@@ -1,5 +1,4 @@
 import numpy as np
-import pytest
 
 from shfl.federated_aggregator.federated_aggregator import FederatedAggregator
 

@@ -1,4 +1,4 @@
-from shfl.private_data.query import IdentityFunction
+from shfl.private.query import IdentityFunction
 from shfl.differential_privacy.dp_mechanism import UnrandomizedMechanism
 
 

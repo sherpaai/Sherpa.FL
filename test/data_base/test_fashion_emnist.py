@@ -1,6 +1,5 @@
-import pytest
-
 from shfl.data_base.fashion_mnist import FashionMnist
+
 
 def test_fashion_emnist():
     data = FashionMnist()

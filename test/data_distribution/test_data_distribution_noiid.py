@@ -3,7 +3,7 @@ import random
 
 from shfl.data_base.data_base import DataBase
 from shfl.data_distribution.data_distribution_non_iid import NonIidDataDistribution
-from shfl.private_data.data import UnprotectedAccess
+from shfl.private.data import UnprotectedAccess
 
 
 class TestDataBase(DataBase):
@@ -84,7 +84,7 @@ def test_get_federated_data():
 
     dt = NonIidDataDistribution(data)
 
-    # Identifier and num nodes is checked in private_data test.
+    # Identifier and num nodes is checked in private test.
     # Percent and weight is checked in idd and no_idd test.
     # So here, we only test mistaken param.
     mistaken = 50

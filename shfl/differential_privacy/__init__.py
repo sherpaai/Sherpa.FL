@@ -9,4 +9,8 @@ from shfl.differential_privacy.dp_mechanism import LaplaceMechanism
 from shfl.differential_privacy.sensitivity_sampler import SensitivitySampler
 from shfl.differential_privacy.norm import SensitivityNorm
 from shfl.differential_privacy.norm import L1SensitivityNorm
+from shfl.differential_privacy.probability_distribution import ProbabilityDistribution
+from shfl.differential_privacy.probability_distribution import NormalDistribution
+from shfl.differential_privacy.probability_distribution import GaussianMixture
+
 

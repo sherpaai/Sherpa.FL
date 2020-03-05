@@ -2,17 +2,17 @@ import numpy as np
 import pytest
 
 import shfl
-from shfl.private_data.data import DataAccessDefinition
+from shfl.private.data import DataAccessDefinition
 from shfl.differential_privacy.dp_mechanism import UnrandomizedMechanism
 from shfl.differential_privacy.dp_mechanism import RandomizeBinaryProperty
 from shfl.differential_privacy.dp_mechanism import LaplaceMechanism
-from shfl.private_data.probability_distribution import NormalDistribution
+from shfl.differential_privacy.probability_distribution import NormalDistribution
 
 
 def test_unrandomized_mechanism():
     data_size = 100
     array = np.random.rand(data_size)
-    federated_array = shfl.private_data.federated_operation.federate_array("my_array", array, data_size)
+    federated_array = shfl.private.federated_operation.federate_array("my_array", array, data_size)
     federated_array.configure_data_access(DataAccessDefinition(dp_mechanism=UnrandomizedMechanism()))
     for i in range(data_size):
         assert len(federated_array[i].query_private_data("my_array")) == 1
@@ -22,7 +22,7 @@ def test_unrandomized_mechanism():
 def test_randomize_binary_mechanism():
     data_size = 100
     array = np.ones(data_size)
-    federated_array = shfl.private_data.federated_operation.federate_array("my_array", array, data_size)
+    federated_array = shfl.private.federated_operation.federate_array("my_array", array, data_size)
 
     federated_array.configure_data_access(DataAccessDefinition(dp_mechanism=RandomizeBinaryProperty()))
 
@@ -39,7 +39,7 @@ def test_randomize_binary_mechanism():
 def test_randomize_binary_mechanism_no_binary():
     data_size = 100
     array = np.random.rand(data_size)
-    federated_array = shfl.private_data.federated_operation.federate_array("my_array", array, data_size)
+    federated_array = shfl.private.federated_operation.federate_array("my_array", array, data_size)
 
     federated_array.configure_data_access(DataAccessDefinition(dp_mechanism=RandomizeBinaryProperty()))
 
@@ -50,7 +50,7 @@ def test_randomize_binary_mechanism_no_binary():
 def test_laplace_mechanism():
     data_size = 1000
     array = NormalDistribution(175, 7).sample(data_size)
-    federated_array = shfl.private_data.federated_operation.federate_array("my_array", array, data_size)
+    federated_array = shfl.private.federated_operation.federate_array("my_array", array, data_size)
 
     federated_array.configure_data_access(DataAccessDefinition(dp_mechanism=LaplaceMechanism(40, 1)))
     result = federated_array.query()

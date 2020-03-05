@@ -4,7 +4,7 @@ from unittest.mock import Mock
 from shfl.learning_approach.federated_government import FederatedGovernment
 from shfl.data_base.data_base import DataBase
 from shfl.data_distribution.data_distribution_iid import IidDataDistribution
-from shfl.private_data.data import UnprotectedAccess
+from shfl.private.data import UnprotectedAccess
 
 
 class TestDataBase(DataBase):

@@ -1,5 +1,5 @@
 import abc
-from shfl.private_data.node import DataNode
+from shfl.private.node import DataNode
 
 
 class FederatedData:

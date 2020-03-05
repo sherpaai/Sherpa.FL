@@ -1,6 +1,6 @@
 import copy
 
-from shfl.private_data.data import UnprotectedAccess
+from shfl.private.data import UnprotectedAccess
 
 
 class DataNode:
@@ -21,7 +21,7 @@ class DataNode:
 
         Returns
         ------
-        private_data : object
+        private : object
             test data
         """
         print("Node private data, you can see the data for debug purposes but the data remains in the node")

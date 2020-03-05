@@ -1,6 +1,5 @@
-import pytest
-
 from shfl.data_base.emnist import Emnist
+
 
 def test_emnist():
     data = Emnist()

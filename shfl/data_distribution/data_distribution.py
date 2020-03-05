@@ -2,9 +2,9 @@ import numpy as np
 import random
 import abc
 
-from shfl.private_data.data import LabeledData
-from shfl.private_data.federated_operation import FederatedData
-from shfl.private_data.node import DataNode
+from shfl.private.data import LabeledData
+from shfl.private.federated_operation import FederatedData
+from shfl.private.node import DataNode
 
 
 class DataDistribution(abc.ABC):

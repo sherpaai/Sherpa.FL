@@ -1,7 +1,7 @@
 import numpy as np
 
-from shfl.private_data.query import Mean
-from shfl.private_data.probability_distribution import NormalDistribution
+from shfl.private.query import Mean
+from shfl.differential_privacy.probability_distribution import NormalDistribution
 from shfl.differential_privacy import SensitivitySampler
 from shfl.differential_privacy import L1SensitivityNorm
 

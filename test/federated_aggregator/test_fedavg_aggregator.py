@@ -2,6 +2,7 @@ import numpy as np
 
 from shfl.federated_aggregator.avgfed_aggregator import AvgFedAggregator
 
+
 def test_aggregated_weights():
     num_clients = 10
     num_layers = 5

@@ -1,7 +1,7 @@
 import numpy as np
 
-from shfl.private_data.probability_distribution import NormalDistribution
-from shfl.private_data.probability_distribution import GaussianMixture
+from shfl.differential_privacy.probability_distribution import NormalDistribution
+from shfl.differential_privacy.probability_distribution import GaussianMixture
 
 
 def test_normal_distribution():

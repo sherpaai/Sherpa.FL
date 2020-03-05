@@ -2,7 +2,6 @@ import numpy as np
 
 from shfl.data_base.data_base import DataBase
 from shfl.data_distribution.data_distribution_iid import IidDataDistribution
-from shfl.private_data.data import UnprotectedAccess
 
 
 class TestDataBase(DataBase):
