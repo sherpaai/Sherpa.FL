@@ -116,7 +116,7 @@ def test_get_federated_data():
         for data in node:
             assert data in x
             idx.append(np.where((data == x).all(axis=1))[0][0])
-            labels_node.append(y[idx[-1]])
+            labels_node.append(y[idx[-1]].argmax(axis=-1))
         if not (labels_node == y_c[i]).all():
             num_mistaken = num_mistaken + 1
 
