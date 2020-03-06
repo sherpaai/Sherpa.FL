@@ -82,7 +82,6 @@ def test_make_data_federated():
 def test_get_federated_data():
     data = TestDataBase()
     data.load_data()
-
     dt = NonIidDataDistribution(data)
 
     # Identifier and num nodes is checked in private test.
