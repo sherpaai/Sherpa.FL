@@ -96,7 +96,6 @@ class RandomizedResponseBinary(DifferentialPrivacyMechanism):
 
         Both the input and output of the method are binary arrays.
         """
-        data = np.array(data)
         x_response = np.zeros(len(data))
         x_zero = data == 0
         x_response[x_zero] = scipy.stats.bernoulli.rvs(1 - self._f2, size=sum(x_zero))
