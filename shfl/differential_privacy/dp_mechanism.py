@@ -1,4 +1,7 @@
+from typing import Any, Union
+
 import numpy as np
+import scipy
 import abc
 
 
@@ -69,6 +72,37 @@ class RandomizeBinaryProperty(DifferentialPrivacyMechanism):
 
         return 1
 
+
+class RandomizedResponseBinary(DifferentialPrivacyMechanism):
+    """
+    P(1|1) = f1
+    P(0|0) = f2
+
+    For f1=f2=0 or 1, the algorithm is not random. It is maximally random for f1=f2=1/2.
+    This class contains, for special cases of f1, f2, the class RandomizeBinaryProperty.
+
+    # Arguments
+        f1: float in [0,1]
+        f2: float in [0,1]
+    """
+
+    def __init__(self, f1, f2):
+        self._f1 = f1
+        self._f2 = f2
+
+    def randomize(self, data):
+        """
+        Implements the general binary randomized response algorithm.
+
+        Both the input and output of the method are binary arrays.
+        """
+        data = np.array(data)
+        x_response = np.zeros(len(data))
+        x_zero = data == 0
+        x_response[x_zero] = scipy.stats.bernoulli.rvs(1 - self._f2, size=sum(x_zero))
+        x_response[~x_zero] = scipy.stats.bernoulli.rvs(self._f1, size=len(data)-sum(x_zero))
+
+        return x_response
 
 class LaplaceMechanism(DifferentialPrivacyMechanism):
     """
