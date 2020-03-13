@@ -75,20 +75,23 @@ class RandomizeBinaryProperty(DifferentialPrivacyMechanism):
 
 class RandomizedResponseBinary(DifferentialPrivacyMechanism):
     """
-    P(1|1) = f1
-    P(0|0) = f2
+    Implements the most general binary randomized response algorithm. Both the input and output are binary
+    arrays. The algorithm is defined through the conditional probabilities
 
-    For f1=f2=0 or 1, the algorithm is not random. It is maximally random for f1=f2=1/2.
-    This class contains, for special cases of f1, f2, the class RandomizeBinaryProperty.
+    - P( output=0 | input=0 ) = f0
+    - P( output=1 | input=1) = f1
+
+    For f0=f1=0 or 1, the algorithm is not random. It is maximally random for f0=f1=1/2.
+    This class contains, for special cases of f0, f1, the class RandomizeBinaryProperty.
 
     # Arguments
-        f1: float in [0,1]
-        f2: float in [0,1]
+        f0: float in [0,1] representing the probability of getting 0 when the input is 0
+        f1: float in [0,1] representing the probability of getting 1 when the input is 1
     """
 
-    def __init__(self, f1, f2):
+    def __init__(self, f0, f1):
+        self._f0 = f0
         self._f1 = f1
-        self._f2 = f2
 
     def randomize(self, data):
         """
@@ -98,7 +101,7 @@ class RandomizedResponseBinary(DifferentialPrivacyMechanism):
         """
         x_response = np.zeros(len(data))
         x_zero = data == 0
-        x_response[x_zero] = scipy.stats.bernoulli.rvs(1 - self._f2, size=sum(x_zero))
+        x_response[x_zero] = scipy.stats.bernoulli.rvs(1 - self._f0, size=sum(x_zero))
         x_response[~x_zero] = scipy.stats.bernoulli.rvs(self._f1, size=len(data)-sum(x_zero))
 
         return x_response
