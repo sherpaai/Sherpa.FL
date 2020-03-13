@@ -2,8 +2,9 @@ import numpy as np
 import pytest
 
 import shfl
+from shfl.private import DataNode
 from shfl.private.data import DataAccessDefinition
-from shfl.differential_privacy.dp_mechanism import UnrandomizedMechanism
+from shfl.differential_privacy.dp_mechanism import UnrandomizedMechanism, RandomizedResponseBinary
 from shfl.differential_privacy.dp_mechanism import RandomizeBinaryProperty
 from shfl.differential_privacy.dp_mechanism import LaplaceMechanism
 from shfl.differential_privacy.probability_distribution import NormalDistribution
@@ -34,6 +35,18 @@ def test_randomize_binary_mechanism():
 
     assert 0 < differences < data_size
     assert np.mean(result) < 1
+
+def test_randomize_binary_deterministic():
+    array = np.array([0, 1])
+    node_single = DataNode()
+    node_single.set_private_data(name="A", data=array)
+    dp_mechanism = RandomizedResponseBinary(f0=1, f1=1)
+    data_access_definition = DataAccessDefinition(dp_mechanism=dp_mechanism)
+    node_single.configure_private_data_access("A", data_access_definition)
+
+    result = node_single.query_private_data(private_property="A")
+
+    assert np.array_equal(array, result)
 
 
 def test_randomize_binary_mechanism_no_binary():
