@@ -5,7 +5,7 @@ import shfl
 from shfl.private import DataNode
 from shfl.private.data import DataAccessDefinition
 from shfl.differential_privacy.dp_mechanism import UnrandomizedMechanism, RandomizedResponseBinary
-from shfl.differential_privacy.dp_mechanism import RandomizeBinaryProperty
+from shfl.differential_privacy.dp_mechanism import RandomizedResponseCoins
 from shfl.differential_privacy.dp_mechanism import LaplaceMechanism
 from shfl.differential_privacy.probability_distribution import NormalDistribution
 
@@ -25,7 +25,7 @@ def test_randomize_binary_mechanism():
     array = np.ones(data_size)
     federated_array = shfl.private.federated_operation.federate_array("my_array", array, data_size)
 
-    federated_array.configure_data_access(DataAccessDefinition(dp_mechanism=RandomizeBinaryProperty()))
+    federated_array.configure_data_access(DataAccessDefinition(dp_mechanism=RandomizedResponseCoins()))
 
     result = federated_array.query()
     differences = 0
@@ -72,7 +72,7 @@ def test_randomize_binary_mechanism_no_binary():
     array = np.random.rand(data_size)
     federated_array = shfl.private.federated_operation.federate_array("my_array", array, data_size)
 
-    federated_array.configure_data_access(DataAccessDefinition(dp_mechanism=RandomizeBinaryProperty()))
+    federated_array.configure_data_access(DataAccessDefinition(dp_mechanism=RandomizedResponseCoins()))
 
     with pytest.raises(ValueError):
         federated_array.query()
