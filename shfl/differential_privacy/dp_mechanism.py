@@ -1,5 +1,3 @@
-from typing import Any, Union
-
 import numpy as np
 import scipy
 import abc
@@ -105,6 +103,7 @@ class RandomizedResponseBinary(DifferentialPrivacyMechanism):
         x_response[~x_zero] = scipy.stats.bernoulli.rvs(self._f1, size=len(data)-sum(x_zero))
 
         return x_response
+
 
 class LaplaceMechanism(DifferentialPrivacyMechanism):
     """
