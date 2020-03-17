@@ -96,3 +96,16 @@ def test_laplace_mechanism():
 
     assert differences == data_size
     assert np.mean(array) - np.mean(result) < 5
+
+
+def test_laplace_scalar_mechanism():
+    scalar = 175
+
+    node = DataNode()
+    node.set_private_data("scalar", scalar)
+    node.configure_private_data_access("scalar", DataAccessDefinition(dp_mechanism=LaplaceMechanism(40, 1)))
+
+    result = node.query("scalar")
+
+    assert scalar != result
+    assert np.abs(scalar - result) < 100

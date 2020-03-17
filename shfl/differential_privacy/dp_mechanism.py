@@ -133,4 +133,10 @@ class LaplaceMechanism(DifferentialPrivacyMechanism):
 
     def randomize(self, data):
         b = self._sensitivity/self._epsilon
-        return data + np.random.laplace(loc=0.0, scale=b, size=len(data))
+
+        if np.isscalar(data):
+            size = 1
+        else:
+            size = len(data)
+
+        return data + np.random.laplace(loc=0.0, scale=b, size=size)
