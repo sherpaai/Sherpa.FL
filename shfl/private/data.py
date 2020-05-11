@@ -47,6 +47,21 @@ class DataAccessDefinition(abc.ABC):
             result_data: Result data, function of argument data
         """
 
+class DPDataAccessDefinition(DataAccessDefinition):
+    """
+    Interface that must be implemented in order to define how to access differentially private data
+    """
+    
+    @property
+    @abc.abstractclassmethod
+    def epsilon_delta(self):
+        """
+        Every differentially private mechanism needs to implement this property
+        
+        # Returns
+            epsilon_delta: Privacy budget spent each time this differentially private mechanism is used
+        
+        """
 
 class UnprotectedAccess(DataAccessDefinition):
     """

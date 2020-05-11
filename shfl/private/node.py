@@ -2,6 +2,25 @@ import copy
 
 from shfl.private.data import UnprotectedAccess
 
+class ExceededPrivacyBudgetError(Exception):
+    """
+    This Exception is expected to be used when a certain privacy budget is exceed. 
+    When it is used, it means that the data cannot be accessed anymore
+
+    # Arguments:
+        message: this text is shown in addition to the exception text
+    """
+    def __init__(self, *args):
+        if args:
+            self.message = args[0]
+        else:
+            self.message = None
+
+    def __str__(self):
+        if self.message:
+            return 'Error: Privacy Budget has been exceeded, {0} '.format(self.message)
+        else:
+            return 'Error: Privacy Budget has been exceeded'
 
 class DataNode:
     """
@@ -10,20 +29,38 @@ class DataNode:
     A DataNode has its own private data and provides methods
     to initialize this data and access to it. The access to private data needs to be configured with an access policy
     before query it or an exception will be raised. A method to transform private data is also provided. This is
-    a mechanism that allows data preprocessing or related task over data.
+    a mechanism that allows data preprocessing or related task over data. It supports Differential Privacy
 
     A model (see: [Model](../../model)) can be deployed in the DataNode and use private data
     in order to learn. It is assumed that a model is represented by its parameters and the access to these parameters
     must be also configured before queries.
+    
+    # Arguments:
+        epsilon_delta: Tuple or array of length 2 which contains the epsilon-delta privacy budget for this data
+    
     """
 
-    def __init__(self):
+    def __init__(self, epsilon_delta=None):
         self._private_data = {}
         self._private_test_data = {}
         self._private_data_access_policies = {}
         self._model = None
         self._model_access_policy = UnprotectedAccess()
+        self._epsilon_delta = None
+        if epsilon_delta is not None:
+            if len(epsilon_delta) != 2:
+                raise ValueError("epsilon_delta parameter should be a tuple with two elements, but {} were given".format(len(epsilon_delta)))
+            self._epsilon_delta = epsilon_delta
+            self._epsilon_delta_access_history = []
+            if self._epsilon_delta[0] <= 0:
+                raise ValueError("Epsilon have to be greater than zero")
+            if self._epsilon_delta[1] < 0:
+                raise ValueError("Delta have to be greater than zero")
 
+    @property
+    def epsilon_delta(self):
+        return self._epsilon_delta
+    
     @property
     def model(self):
         print("You can't get the model, you need to query the params to access")
@@ -94,7 +131,17 @@ class DataNode:
             name: Identifier for the data that will be configured
             data_access_definition: Policy to access data (see: [DataAccessDefinition](../data/#dataaccessdefinition))
         """
+        access_policy_eps_delta_available = hasattr(data_access_definition, 'epsilon_delta')
+        eps_delta_available = self._epsilon_delta is not None
+        
+        if access_policy_eps_delta_available and not eps_delta_available:
+            raise ValueError("You can't access non differentially private data with a differentially private mechanism")
+        
+        if not access_policy_eps_delta_available and eps_delta_available:
+            raise ValueError("You can't access differentially private data with a non differentially private mechanism")
+        
         self._private_data_access_policies[name] = copy.deepcopy(data_access_definition)
+
 
     def configure_model_params_access(self, data_access_definition):
         """
@@ -126,7 +173,19 @@ class DataNode:
             raise ValueError("Data access must be configured before query data")
 
         data_access_policy = self._private_data_access_policies[private_property]
-        return data_access_policy.apply(self._private_data[private_property])
+
+        access_policy_eps_delta_available = hasattr(data_access_policy, 'epsilon_delta')
+        
+        if access_policy_eps_delta_available:
+            self._epsilon_delta_access_history.append(data_access_policy.epsilon_delta)
+            eps_sum, delta_sum = map(sum, zip(*self._epsilon_delta_access_history))
+            if eps_sum > self._epsilon_delta[0] or delta_sum > self._epsilon_delta[1]:
+                self._epsilon_delta_access_history.pop()
+                raise ExceededPrivacyBudgetError()
+            else:
+                return data_access_policy.apply(self._private_data[private_property])
+        else:
+            return data_access_policy.apply(self._private_data[private_property])
 
     def query_model_params(self):
         """

@@ -10,6 +10,7 @@ from shfl.private.federated_operation import FederatedData
 from shfl.private.federated_operation import FederatedDataNode
 from shfl.private.federated_operation import FederatedTransformation
 from shfl.private.node import DataNode
+from shfl.private.node import ExceededPrivacyBudgetError
 from shfl.private.query import Query
 from shfl.private.query import Mean
 from shfl.private.query import IdentityFunction

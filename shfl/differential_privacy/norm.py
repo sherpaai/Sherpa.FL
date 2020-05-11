@@ -27,3 +27,11 @@ class L1SensitivityNorm(SensitivityNorm):
     def compute(self, x_1, x_2):
         x = x_1 - x_2
         return np.sum(np.abs(x))
+
+class L2SensitivityNorm(SensitivityNorm):
+    """
+    Implements the L2 norm of the difference between x_1 and x_2
+    """
+    def compute(self, x_1, x_2):
+        x = x_1 - x_2
+        return np.sqrt(np.sum(x**2))

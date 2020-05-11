@@ -6,10 +6,12 @@ from shfl.private.data import LabeledData
 class FederatedDataNode(DataNode):
     """
     This class represents a [DataNode](../data_node) in a FederatedData. Extends DataNode allowing
-    calls to methods without explicit private data identifier, assuming access to the federated data.
+    calls to methods without explicit private data identifier, assuming access to the federated data. 
+    It supports Differential Privacy
 
     # Arguments:
         federated_data_identifier: identifier to use in private data
+        epsilon_delta:  Epsilon-delta privacy budget to be set for this data-node
 
     When you iterate over [FederatedData](./#federateddata-class) the kind of DataNode that you obtain is a \
     FederatedDataNode.
@@ -27,8 +29,8 @@ class FederatedDataNode(DataNode):
         federated_data[0].query()
     ```
     """
-    def __init__(self, federated_data_identifier):
-        super().__init__()
+    def __init__(self, federated_data_identifier, epsilon_delta=None):
+        super().__init__(epsilon_delta)
         self._federated_data_identifier = federated_data_identifier
 
     def query(self, private_property=None):
@@ -59,7 +61,7 @@ class FederatedDataNode(DataNode):
         Splits private_data in train and test sets
 
         # Arguments:
-             training_data_key: String identifying the private data to use for this model. This key must contain
+            training_data_key: String identifying the private data to use for this model. This key must contain
             LabeledData (see: [Data](../../Data))
 
             test_split: percentage of test split
@@ -77,13 +79,14 @@ class FederatedDataNode(DataNode):
 
 class FederatedData:
     """
-    Class representing data across different data nodes.
+    Class representing data across different data nodes. It supports Differential Privacy
 
     This object is iterable over different data nodes.
     """
 
-    def __init__(self):
+    def __init__(self, epsilon_delta=None):
         self._data_nodes = []
+        self._epsilon_delta = epsilon_delta
 
     def __getitem__(self, item):
         return self._data_nodes[item]
@@ -98,7 +101,7 @@ class FederatedData:
         # Arguments:
             data: Data to add to this node
         """
-        node = FederatedDataNode(str(id(self)))
+        node = FederatedDataNode(str(id(self)), self._epsilon_delta)
         node.set_private_data(data)
         self._data_nodes.append(node)
 
@@ -147,15 +150,16 @@ class FederatedTransformation(abc.ABC):
         """
 
 
-def federate_array(array, num_data_nodes):
+def federate_array(array, num_data_nodes, epsilon_delta=None):
     """
     Creates [FederatedData](./#federateddata-class) from an indexable array.
 
-    The array will be divided using the first dimension.
+    The array will be divided using the first dimension. It supports Differential Privacy
 
     # Arguments:
         array: Indexable array with any number of dimensions
         num_data_nodes: Number of nodes to use
+        epsilon_delta: Epsilon-delta privacy budget to be set for each node
 
     # Returns
         federated_array: [FederatedData](./#federateddata-class) with an array of size len(array)/num_data_nodes \
@@ -164,7 +168,7 @@ def federate_array(array, num_data_nodes):
     split_size = len(array) / float(num_data_nodes)
     last = 0.0
 
-    federated_array = FederatedData()
+    federated_array = FederatedData(epsilon_delta)
     while last < len(array):
         federated_array.add_data_node(array[int(last):int(last + split_size)])
         last = last + split_size
