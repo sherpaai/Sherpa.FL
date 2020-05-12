@@ -89,7 +89,9 @@ class RandomizedResponseBinary(DPDataAccessDefinition):
         if f1 <= 0 or f1 >= 1:
             raise ValueError("f1 argument must be between 0 an 1, {} was provided".format(f1))
         if epsilon < log(max(f0 / (1 - f1), f1 / (1 - f0))):
-            raise ValueError("To ensure epsilon differential privacy, the following inequality mus be satified exp(epsilon) >= max { f0 / (1 - f1), f1 / (1 - f0)}")
+            raise ValueError("To ensure epsilon differential privacy, " +
+                            "the following inequality mus be satified " +
+                            "{}=epsilon >= {}=log max ( f0 / (1 - f1), f1 / (1 - f0))".format(epsilon, log(max(f0 / (1 - f1), f1 / (1 - f0)))))
         self._f0 = f0
         self._f1 = f1
         self._epsilon_delta = (epsilon, 0)
