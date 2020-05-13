@@ -38,15 +38,18 @@ def advanced_adaptative_comp_theorem(epsilon_delta_access_history, epsilon_delta
     global_epsilon, global_delta = epsilon_delta
     
     delta_sum = sum(delta_history)
-    eps_squared_sum = sum(eps * eps for eps in epsilon_history)
+    epsilon_squared_sum = sum(epsilon**2 for epsilon in epsilon_history)
     
-    A = sum(eps * (eps - 1) * 0.5 for eps in epsilon_history)
-    B = eps_squared_sum + global_epsilon * global_epsilon / (28.04 * log(1 / global_delta))
-    C = 1 + 0.5 * log(28.04 * abs(log(1 / global_delta)) * eps_squared_sum / (global_epsilon**2) + 1)
+    H = global_epsilon**2 / (28.04 * log(1 / global_delta))
     
-    K = A + sqrt(2 * B * C * abs(log(2 / global_delta)))
+    A = sum(eps * (exp(eps) - 1) * 0.5 for eps in epsilon_history)
+    B = epsilon_squared_sum + H
+    C = 2 + log(epsilon_squared_sum / H + 1)
+    D = log(2 / global_delta)
     
-    return K > global_epsilon or delta_sum > global_delta*0.5
+    K = A + sqrt (B * C * D)
+    
+    return K > global_epsilon or delta_sum > global_delta * 0.5
 
 
 class ExceededPrivacyBudgetError(Exception):
@@ -56,16 +59,25 @@ class ExceededPrivacyBudgetError(Exception):
 
     # Arguments:
         message: this text is shown in addition to the exception text
+        epsilon_delta: the privacy budget which has been surpassed
+
     """
-    def __init__(self, *args):
+    def __init__(self, **args):
+        self._epsilon_delta = None
+        self._message = None
         if args:
-            self.message = args[0]
-        else:
-            self.message = None
+            if "epsilon_delta" in args:
+                self._epsilon_delta = args["epsilon_delta"]
+            if "message" in args:
+                self._message = args["message"]
 
     def __str__(self):
-        if self.message:
-            return 'Error: Privacy Budget has been exceeded, {0} '.format(self.message)
+        if self._message and self._epsilon_delta:
+            return 'Error: Privacy Budget {} has been exceeded, {} '.format(self._message, self._epsilon_delta)
+        elif self._epsilon_delta:
+            return 'Error: Privacy Budget {} has been exceeded'.format(self._epsilon_delta)
+        elif self._message:
+            return 'Error: Privacy Budget has been exceeded, {}'.format(self._message)
         else:
             return 'Error: Privacy Budget has been exceeded'
 
@@ -86,19 +98,17 @@ class DataNode:
     
     # Arguments:
         epsilon_delta: Tuple or array of length 2 which contains the epsilon-delta privacy budget for this data
-        suppressWarning: suppress (epsilon, delta) warning which states that the basic composition theorem 
-            for Adaptive Differential Privacy is going to be used
-            
+
     """
 
-    def __init__(self, epsilon_delta=None, suppressWarning=False):
+    def __init__(self, epsilon_delta=None):
         self._private_data = {}
         self._private_test_data = {}
         self._private_data_access_policies = {}
         self._model = None
         self._model_access_policy = UnprotectedAccess()
         self._epsilon_delta = None
-        self._adaptative_pd_basic_mode = True
+        self._epsilon_delta_access_history = None
         if epsilon_delta is not None:
             if len(epsilon_delta) != 2:
                 raise ValueError("epsilon_delta parameter has to be a tuple or list of length 2, but {} were given".format(len(epsilon_delta)))
@@ -108,11 +118,6 @@ class DataNode:
                 raise ValueError("Epsilon has to be greater than zero")
             if self._epsilon_delta[1] < 0:
                 raise ValueError("Delta has to be greater than zero")
-            
-            if self._epsilon_delta[1] < exp(-1) and self._epsilon_delta[1] > 0:
-                self._adaptative_pd_basic_mode = False
-            elif not suppressWarning:
-                warn("To use more efficently the (epsilon, delta) privacy budget, delta should be between 0 and exp(-1)")
     
     
     @property
@@ -237,13 +242,13 @@ class DataNode:
         if access_policy_eps_delta_available:
             self._epsilon_delta_access_history.append(data_access_policy.epsilon_delta)
             
-            if self._adaptative_pd_basic_mode:
-                privacy_budget_exceeded = basic_adaptative_comp_theorem(self._epsilon_delta_access_history, self.epsilon_delta)
-            else:
-                privacy_budget_exceeded = advanced_adaptative_comp_theorem(self._epsilon_delta_access_history, self.epsilon_delta)
+            privacy_budget_exceeded = basic_adaptative_comp_theorem(self._epsilon_delta_access_history, self.epsilon_delta)
+            if self._epsilon_delta[1] > 0 and self._epsilon_delta[1] < exp(-1):
+                privacy_budget_exceeded |= advanced_adaptative_comp_theorem(self._epsilon_delta_access_history, self.epsilon_delta)
+                
             if privacy_budget_exceeded:
                 self._epsilon_delta_access_history.pop()
-                raise ExceededPrivacyBudgetError()
+                raise ExceededPrivacyBudgetError(epsilon_delta=self._epsilon_delta)
             else:
                 return data_access_policy.apply(self._private_data[private_property])
         else:

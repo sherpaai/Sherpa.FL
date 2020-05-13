@@ -16,7 +16,7 @@ from shfl.differential_privacy.probability_distribution import NormalDistributio
 def test_randomize_binary_mechanism_coins():
     data_size = 100
     array = np.ones(data_size)
-    federated_array = shfl.private.federated_operation.federate_array(array, data_size, epsilon_delta=(log(3), 0), suppressWarning=True)
+    federated_array = shfl.private.federated_operation.federate_array(array, data_size, epsilon_delta=(log(3), 0))
 
     federated_array.configure_data_access(RandomizedResponseCoins())
 
@@ -32,7 +32,7 @@ def test_randomize_binary_mechanism_coins():
 
 def test_randomize_binary_mechanism_array_coins():
     array = np.ones(100)
-    node_single = DataNode(epsilon_delta=(log(3), 0), suppressWarning=True)
+    node_single = DataNode(epsilon_delta=(log(3), 0))
     node_single.set_private_data(name="array", data=array)
 
     node_single.configure_data_access("array", RandomizedResponseCoins())
@@ -50,7 +50,7 @@ def test_randomize_binary_mechanism_array_coins():
 
 def test_randomize_binary_mechanism_array_almost_always_true_values_coins():
     array = np.ones(1000)
-    node_single = DataNode(epsilon_delta=(log(3), 0), suppressWarning=True)
+    node_single = DataNode(epsilon_delta=(log(3), 0))
     node_single.set_private_data(name="array", data=array)
 
     # Very low heads probability in the first attempt, mean should be near true value
@@ -64,7 +64,7 @@ def test_randomize_binary_mechanism_array_almost_always_true_values_coins():
 
 def test_randomize_binary_mechanism_array_almost_always_random_values_coins():
     array = np.ones(1000)
-    node_single = DataNode(epsilon_delta=(log(3), 0), suppressWarning=True)
+    node_single = DataNode(epsilon_delta=(log(3), 0))
     node_single.set_private_data(name="array", data=array)
 
     # Very high heads probability in the first attempt, mean should be near prob_head_second
@@ -78,7 +78,7 @@ def test_randomize_binary_mechanism_array_almost_always_random_values_coins():
 
 def test_randomize_binary_mechanism_scalar_coins():
     scalar = 1
-    node_single = DataNode(epsilon_delta=(log(3), 0), suppressWarning=True)
+    node_single = DataNode(epsilon_delta=(log(3), 0))
     node_single.set_private_data(name="scalar", data=scalar)
 
     node_single.configure_data_access("scalar", RandomizedResponseCoins())
@@ -92,7 +92,7 @@ def test_randomize_binary_mechanism_scalar_coins():
 def test_randomize_binary_mechanism_no_binary_coins():
     data_size = 100
     array = np.random.rand(data_size)
-    federated_array = shfl.private.federated_operation.federate_array(array, data_size, epsilon_delta=(log(3), 0), suppressWarning=True)
+    federated_array = shfl.private.federated_operation.federate_array(array, data_size, epsilon_delta=(log(3), 0))
 
     federated_array.configure_data_access(RandomizedResponseCoins())
 
@@ -111,7 +111,7 @@ def test_randomize_binary_deterministic():
 def test_randomize_binary_random():
     data_size = 100
     array = np.ones(data_size)
-    node_single = DataNode(epsilon_delta=(1, 0), suppressWarning=True)
+    node_single = DataNode(epsilon_delta=(1, 0))
     node_single.set_private_data(name="A", data=array)
     data_access_definition = RandomizedResponseBinary(f0=0.5, f1=0.5, epsilon=1)
     node_single.configure_data_access("A", data_access_definition)
@@ -129,7 +129,7 @@ def test_randomize_binary_random():
 
 def test_randomize_binary_random_scalar_1():
     scalar = 1
-    node_single = DataNode(epsilon_delta=(1, 0), suppressWarning=True)
+    node_single = DataNode(epsilon_delta=(1, 0))
     node_single.set_private_data(name="scalar", data=scalar)
     data_access_definition = RandomizedResponseBinary(f0=0.5, f1=0.5, epsilon=1)
     node_single.configure_data_access("scalar", data_access_definition)
@@ -142,7 +142,7 @@ def test_randomize_binary_random_scalar_1():
 
 def test_randomize_binary_random_scalar_0():
     scalar = 0
-    node_single = DataNode(epsilon_delta=(1, 0), suppressWarning=True)
+    node_single = DataNode(epsilon_delta=(1, 0))
     node_single.set_private_data(name="scalar", data=scalar)
     data_access_definition = RandomizedResponseBinary(f0=0.5, f1=0.5, epsilon=1)
     node_single.configure_data_access("scalar", data_access_definition)
@@ -155,7 +155,7 @@ def test_randomize_binary_random_scalar_0():
 
 def test_randomize_binary_mechanism_array_almost_always_true_values_ones():
     array = np.ones(1000)
-    node_single = DataNode(epsilon_delta=(5, 0), suppressWarning=True)
+    node_single = DataNode(epsilon_delta=(5, 0))
     node_single.set_private_data(name="array", data=array)
 
     # Prob of one given 1 very high, mean should be near 1
@@ -169,7 +169,7 @@ def test_randomize_binary_mechanism_array_almost_always_true_values_ones():
 
 def test_randomize_binary_mechanism_array_almost_always_true_values_zeros():
     array = np.zeros(1000)
-    node_single = DataNode(epsilon_delta=(5, 0), suppressWarning=True)
+    node_single = DataNode(epsilon_delta=(5, 0))
     node_single.set_private_data(name="array", data=array)
 
     # Prob of one given 1 very high, mean should be near 1
@@ -183,7 +183,7 @@ def test_randomize_binary_mechanism_array_almost_always_true_values_zeros():
 
 def test_randomize_binary_mechanism_array_almost_always_false_values():
     array = np.ones(1000)
-    node_single = DataNode(epsilon_delta=(1, 0), suppressWarning=True)
+    node_single = DataNode(epsilon_delta=(1, 0))
     node_single.set_private_data(name="array", data=array)
 
     # Prob of one given 1 very low, mean should be near 0
@@ -197,7 +197,7 @@ def test_randomize_binary_mechanism_array_almost_always_false_values():
 
 def test_randomize_binary_mechanism_array_almost_always_false_values_zeros():
     array = np.zeros(1000)
-    node_single = DataNode(epsilon_delta=(1, 0), suppressWarning=True)
+    node_single = DataNode(epsilon_delta=(1, 0))
     node_single.set_private_data(name="array", data=array)
 
     # Prob of one given 1 very low, mean should be near 0
@@ -211,7 +211,7 @@ def test_randomize_binary_mechanism_array_almost_always_false_values_zeros():
 
 def test_randomize_binary_mechanism_no_binary():
     array = np.random.rand(1000)
-    federated_array = shfl.private.federated_operation.federate_array(array, 100, epsilon_delta=(1,0), suppressWarning=True)
+    federated_array = shfl.private.federated_operation.federate_array(array, 100, epsilon_delta=(1,0))
 
     federated_array.configure_data_access(RandomizedResponseBinary(f0=0.5, f1=0.5, epsilon=1))
 
@@ -221,7 +221,7 @@ def test_randomize_binary_mechanism_no_binary():
 
 def test_randomize_binary_mechanism_no_binary_scalar():
     scalar = 0.1
-    node_single = DataNode(epsilon_delta=(1,0), suppressWarning=True)
+    node_single = DataNode(epsilon_delta=(1,0))
     node_single.set_private_data(name="scalar", data=scalar)
     data_access_definition = RandomizedResponseBinary(f0=0.5, f1=0.5, epsilon=1)
     node_single.configure_data_access("scalar", data_access_definition)
@@ -233,7 +233,7 @@ def test_randomize_binary_mechanism_no_binary_scalar():
 def test_laplace_mechanism():
     data_size = 1000
     array = NormalDistribution(175, 7).sample(data_size)
-    federated_array = shfl.private.federated_operation.federate_array(array, data_size, epsilon_delta=(1, 0), suppressWarning=True)
+    federated_array = shfl.private.federated_operation.federate_array(array, data_size, epsilon_delta=(1, 0))
 
     federated_array.configure_data_access(LaplaceMechanism(1, 1))
     result = federated_array.query()
@@ -250,7 +250,7 @@ def test_laplace_mechanism():
 def test_laplace_scalar_mechanism():
     scalar = 175
 
-    node = DataNode(epsilon_delta=(1,0), suppressWarning=True)
+    node = DataNode(epsilon_delta=(1,0))
     node.set_private_data("scalar", scalar)
     node.configure_data_access("scalar", LaplaceMechanism(1, 1))
 
@@ -262,7 +262,7 @@ def test_laplace_scalar_mechanism():
 def test_gaussian_mechanism():
     data_size = 1000
     array = NormalDistribution(175, 7).sample(data_size)
-    federated_array = shfl.private.federated_operation.federate_array(array, data_size, epsilon_delta=(10, 10), suppressWarning=True)
+    federated_array = shfl.private.federated_operation.federate_array(array, data_size, epsilon_delta=(10, 10))
 
     federated_array.configure_data_access(GaussianMechanism(1, epsilon_delta=(1, 1)))
     result = federated_array.query()
@@ -279,7 +279,7 @@ def test_gaussian_mechanism():
 def test_gaussian_scalar_mechanism():
     scalar = 175
 
-    node = DataNode(epsilon_delta=(10, 10), suppressWarning=True)
+    node = DataNode(epsilon_delta=(10, 10))
     node.set_private_data("scalar", scalar)
     node.configure_data_access("scalar", GaussianMechanism(1, epsilon_delta=(1, 1)))
 
@@ -291,7 +291,7 @@ def test_gaussian_scalar_mechanism():
 def test_exception_exceededprivacybudgeterror():
     scalar = 175
 
-    node = DataNode(epsilon_delta=(1, 0), suppressWarning=True)
+    node = DataNode(epsilon_delta=(1, 0))
     node.set_private_data("scalar", scalar)
     node.configure_data_access("scalar", GaussianMechanism(1, epsilon_delta=(1, 1)))
 
@@ -315,7 +315,7 @@ def test_exponential_mechanism_pricing():
     epsilon = 5                     # Set a value for epsilon
     size = 10000                    # We want to repeat the query this many times
 
-    node = DataNode(epsilon_delta=(5, 5), suppressWarning=True)               
+    node = DataNode(epsilon_delta=(5, 5))               
     node.set_private_data(name="bids", data=np.array(x)) 
     data_access_definition = ExponentialMechanism(u, r, delta_u, epsilon, size)
     node.configure_data_access("bids", data_access_definition)
@@ -342,7 +342,7 @@ def test_exponential_mechanism_obtain_laplace():
     epsilon = 1                     # Set a value for epsilon
     size = 100000                   # We want to repeat the query this many times
 
-    node = DataNode(epsilon_delta=(1, 1), suppressWarning=True)             
+    node = DataNode(epsilon_delta=(1, 1))             
     node.set_private_data(name="identity", data=np.array(x))
 
     data_access_definition = ExponentialMechanism(u_laplacian, r, delta_u, epsilon, size)
@@ -351,6 +351,3 @@ def test_exponential_mechanism_obtain_laplace():
 
     assert (result > r.min()).all() and (result < r.max()).all()    # Check all outputs are within range
     assert np.absolute(np.mean(result) - x) < (delta_u/epsilon)     # Check the mean output is close to true value
-    
-# TODO(Dani)
-# - Documentar adecuadamente los métodos de composición adaptativa
