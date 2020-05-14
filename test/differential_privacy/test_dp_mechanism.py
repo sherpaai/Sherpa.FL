@@ -4,7 +4,6 @@ from math import log
 
 import shfl
 from shfl.private import DataNode
-from shfl.private import ExceededPrivacyBudgetError
 from shfl.differential_privacy.dp_mechanism import RandomizedResponseBinary
 from shfl.differential_privacy.dp_mechanism import RandomizedResponseCoins
 from shfl.differential_privacy.dp_mechanism import LaplaceMechanism
@@ -32,7 +31,7 @@ def test_randomize_binary_mechanism_coins():
 
 def test_randomize_binary_mechanism_array_coins():
     array = np.ones(100)
-    node_single = DataNode(epsilon_delta=(log(3), 0))
+    node_single = DataNode(epsilon_delta=(log(3), 0.1))
     node_single.set_private_data(name="array", data=array)
 
     node_single.configure_data_access("array", RandomizedResponseCoins())
@@ -264,7 +263,7 @@ def test_gaussian_mechanism():
     array = NormalDistribution(175, 7).sample(data_size)
     federated_array = shfl.private.federated_operation.federate_array(array, data_size, epsilon_delta=(10, 10))
 
-    federated_array.configure_data_access(GaussianMechanism(1, epsilon_delta=(1, 1)))
+    federated_array.configure_data_access(GaussianMechanism(1, epsilon_delta=(0.1, 1)))
     result = federated_array.query()
 
     differences = 0
@@ -281,26 +280,13 @@ def test_gaussian_scalar_mechanism():
 
     node = DataNode(epsilon_delta=(10, 10))
     node.set_private_data("scalar", scalar)
-    node.configure_data_access("scalar", GaussianMechanism(1, epsilon_delta=(1, 1)))
+    node.configure_data_access("scalar", GaussianMechanism(1, epsilon_delta=(0.1, 1)))
 
     result = node.query("scalar")
 
     assert scalar != result
     assert np.abs(scalar - result) < 100
 
-def test_exception_exceededprivacybudgeterror():
-    scalar = 175
-
-    node = DataNode(epsilon_delta=(1, 0))
-    node.set_private_data("scalar", scalar)
-    node.configure_data_access("scalar", GaussianMechanism(1, epsilon_delta=(1, 1)))
-
-    with pytest.raises(ExceededPrivacyBudgetError):
-        result = node.query("scalar")
-
-    with pytest.raises(ExceededPrivacyBudgetError):
-        result = node.query("scalar")
-    
 def test_exponential_mechanism_pricing():
     
     def u(x, r):
@@ -351,3 +337,24 @@ def test_exponential_mechanism_obtain_laplace():
 
     assert (result > r.min()).all() and (result < r.max()).all()    # Check all outputs are within range
     assert np.absolute(np.mean(result) - x) < (delta_u/epsilon)     # Check the mean output is close to true value
+    
+def test_mechanism_safery_checks():
+    with pytest.raises(ValueError):
+        GaussianMechanism(1, epsilon_delta=(1, 1, 1))
+        
+    with pytest.raises(ValueError):
+        GaussianMechanism(1, epsilon_delta=(-0.5, 1))
+        
+    with pytest.raises(ValueError):
+        GaussianMechanism(1, epsilon_delta=(0.5, -1))
+        
+def test_gaussian_mechanism_correctness():
+    with pytest.raises(ValueError):
+        GaussianMechanism(1, epsilon_delta=(1, 1))
+        
+def test_randomized_response_correctness():
+    with pytest.raises(ValueError):
+        RandomizedResponseBinary(0.1, 2, epsilon = 20)
+    
+    with pytest.raises(ValueError):
+        RandomizedResponseBinary(0.8, 0.8, epsilon=0.1)

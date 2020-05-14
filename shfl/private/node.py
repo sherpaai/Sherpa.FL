@@ -2,54 +2,6 @@ import copy
 
 from shfl.private.data import UnprotectedAccess
 from math import log, sqrt, exp
-from warnings import warn
-
-def basic_adaptative_comp_theorem(epsilon_delta_access_history, epsilon_delta):
-    '''
-        It checks wether the privacy budget given by epsilon_delta is surpassed.
-        
-        It implements the theorem 3.6 from Privacy Odometers and Filters: Pay-as-you-Go Composition.
-        
-        # Arguments:
-            epsilon_delta_access_history: a list of the epsilon-delta expenses of each access
-            epsilon_delta: privacy budget specified for the accessed private data
-        
-        # References:
-            - [Privacy Odometers and Filters: Pay-as-you-Go Composition] (https://arxiv.org/abs/1605.08294)
-    '''
-    eps_sum, delta_sum = map(sum, zip(*epsilon_delta_access_history))
-    return eps_sum > epsilon_delta[0] or delta_sum > epsilon_delta[1]
-
-
-def advanced_adaptative_comp_theorem(epsilon_delta_access_history, epsilon_delta):
-    '''
-        It checks wether the privacy budget given by epsilon_delta is surpassed.
-        
-        It implements the theorem 5.1 from Privacy Odometers and Filters: Pay-as-you-Go Composition.
-        
-        # Arguments:
-            epsilon_delta_access_history: a list of the epsilon-delta expenses of each access
-            epsilon_delta: privacy budget specified for the accessed private data
-        
-        # References:
-            - [Privacy Odometers and Filters: Pay-as-you-Go Composition] (https://arxiv.org/abs/1605.08294)
-    '''
-    epsilon_history, delta_history = zip(*epsilon_delta_access_history)
-    global_epsilon, global_delta = epsilon_delta
-    
-    delta_sum = sum(delta_history)
-    epsilon_squared_sum = sum(epsilon**2 for epsilon in epsilon_history)
-    
-    H = global_epsilon**2 / (28.04 * log(1 / global_delta))
-    
-    A = sum(eps * (exp(eps) - 1) * 0.5 for eps in epsilon_history)
-    B = epsilon_squared_sum + H
-    C = 2 + log(epsilon_squared_sum / H + 1)
-    D = log(2 / global_delta)
-    
-    K = A + sqrt (B * C * D)
-    
-    return K > global_epsilon or delta_sum > global_delta * 0.5
 
 
 class ExceededPrivacyBudgetError(Exception):
@@ -68,16 +20,10 @@ class ExceededPrivacyBudgetError(Exception):
         if args:
             if "epsilon_delta" in args:
                 self._epsilon_delta = args["epsilon_delta"]
-            if "message" in args:
-                self._message = args["message"]
 
     def __str__(self):
-        if self._message and self._epsilon_delta:
+        if self._epsilon_delta:
             return 'Error: Privacy Budget {} has been exceeded, {} '.format(self._message, self._epsilon_delta)
-        elif self._epsilon_delta:
-            return 'Error: Privacy Budget {} has been exceeded'.format(self._epsilon_delta)
-        elif self._message:
-            return 'Error: Privacy Budget has been exceeded, {}'.format(self._message)
         else:
             return 'Error: Privacy Budget has been exceeded'
 
@@ -119,7 +65,55 @@ class DataNode:
             if self._epsilon_delta[1] < 0:
                 raise ValueError("Delta has to be greater than zero")
     
-    
+
+    def __basic_adaptive_comp_theorem(self):
+        '''
+            It checks wether the privacy budget given by epsilon_delta is surpassed.
+            
+            It implements the theorem 3.6 from Privacy Odometers and Filters: Pay-as-you-Go Composition.
+            
+            # Arguments:
+                epsilon_delta_access_history: a list of the epsilon-delta expenses of each access
+                epsilon_delta: privacy budget specified for the accessed private data
+            
+            # References:
+                - [Privacy Odometers and Filters: Pay-as-you-Go Composition] (https://arxiv.org/abs/1605.08294)
+        '''
+        global_epsilon, global_delta = self._epsilon_delta
+        eps_sum, delta_sum = map(sum, zip(*self._epsilon_delta_access_history))
+        return eps_sum > global_epsilon or delta_sum > global_delta
+
+
+    def __advanced_adaptive_comp_theorem(self):
+        '''
+            It checks wether the privacy budget given by epsilon_delta is surpassed.
+            
+            It implements the theorem 5.1 from Privacy Odometers and Filters: Pay-as-you-Go Composition.
+            
+            # Arguments:
+                epsilon_delta_access_history: a list of the epsilon-delta expenses of each access
+                epsilon_delta: privacy budget specified for the accessed private data
+            
+            # References:
+                - [Privacy Odometers and Filters: Pay-as-you-Go Composition] (https://arxiv.org/abs/1605.08294)
+        '''
+        epsilon_history, delta_history = zip(*self._epsilon_delta_access_history)
+        global_epsilon, global_delta = self._epsilon_delta
+        
+        delta_sum = sum(delta_history)
+        epsilon_squared_sum = sum(epsilon**2 for epsilon in epsilon_history)
+        
+        H = global_epsilon**2 / (28.04 * log(1 / global_delta))
+        
+        A = sum(eps * (exp(eps) - 1) * 0.5 for eps in epsilon_history)
+        B = epsilon_squared_sum + H
+        C = 2 + log(epsilon_squared_sum / H + 1)
+        D = log(2 / global_delta)
+        
+        K = A + sqrt (B * C * D)
+
+        return K > global_epsilon or delta_sum > (global_delta * 0.5)
+
     @property
     def epsilon_delta(self):
         return self._epsilon_delta
@@ -242,10 +236,11 @@ class DataNode:
         if access_policy_eps_delta_available:
             self._epsilon_delta_access_history.append(data_access_policy.epsilon_delta)
             
-            privacy_budget_exceeded = basic_adaptative_comp_theorem(self._epsilon_delta_access_history, self.epsilon_delta)
+            privacy_budget_exceeded = self.__basic_adaptive_comp_theorem()
+            print("1. {}".format(privacy_budget_exceeded))
             if self._epsilon_delta[1] > 0 and self._epsilon_delta[1] < exp(-1):
-                privacy_budget_exceeded |= advanced_adaptative_comp_theorem(self._epsilon_delta_access_history, self.epsilon_delta)
-                
+                privacy_budget_exceeded &= self.__advanced_adaptive_comp_theorem()
+                print("2. {}".format(privacy_budget_exceeded))
             if privacy_budget_exceeded:
                 self._epsilon_delta_access_history.pop()
                 raise ExceededPrivacyBudgetError(epsilon_delta=self._epsilon_delta)

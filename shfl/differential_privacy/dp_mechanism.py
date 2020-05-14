@@ -184,7 +184,7 @@ class GaussianMechanism(DPDataAccessDefinition):
     is in the interval (0, 1)
 
     In order to apply this mechanism, we need to compute
-    the sensitivity, which might be hard to compute in practice. The framework provides
+    the l2-sensitivity, which might be hard to compute in practice. The framework provides
     a method to estimate the sensitivity of a query that maps the private data in a normed space
     (see: [SensitivitySampler](../sensitivity_sampler))
 
@@ -202,7 +202,7 @@ class GaussianMechanism(DPDataAccessDefinition):
     """
     def __init__(self, sensitivity, epsilon_delta, query=None):
         _safety_checks(epsilon_delta)
-        if epsilon_delta[0] > 1:
+        if epsilon_delta[0] >= 1:
             raise ValueError("In the Gaussian mechanism epsilon have to be greater than 0 and less than 1")
         if query is None:
             query = IdentityFunction()

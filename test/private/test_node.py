@@ -5,7 +5,8 @@ import pytest
 from shfl.private.node import DataNode
 from shfl.private.data import LabeledData
 from shfl.private.data import UnprotectedAccess
-
+from shfl.differential_privacy.dp_mechanism import GaussianMechanism
+from shfl.private import ExceededPrivacyBudgetError
 
 def test_private_data():
     random_array = np.random.rand(30)
@@ -88,3 +89,41 @@ def test_set_params():
     data_node.model = model_mock
     data_node.set_model_params(random_array)
     model_mock.set_model_params.assert_called_once_with(random_array)
+    
+def test_exception_exceededprivacybudgeterror():
+    scalar = 175
+
+    node = DataNode(epsilon_delta=(1, 0))
+    node.set_private_data("scalar", scalar)
+    node.configure_data_access("scalar", GaussianMechanism(1, epsilon_delta=(0.1, 1)))
+
+    with pytest.raises(ExceededPrivacyBudgetError):
+        node.query("scalar")
+        
+def test_constructor_bad_params():
+    with pytest.raises(ValueError):
+        DataNode(epsilon_delta=(1,2,3))
+
+    with pytest.raises(ValueError):
+        DataNode(epsilon_delta=(-1,2))
+        
+    with pytest.raises(ValueError):
+        DataNode(epsilon_delta=(1,-2))
+        
+def test_get_epsilon_delta():
+    e_d = (1, 1)
+    data_node = DataNode(epsilon_delta=e_d)
+    
+    assert data_node.epsilon_delta == e_d
+
+def test_configure_data_access1():
+    data_node = DataNode()
+    data_node.set_private_data("test", np.array(range(10)))
+    with pytest.raises(ValueError):
+        data_node.configure_data_access("test", GaussianMechanism(1, epsilon_delta=(1,1)))
+
+def test_configure_data_access2():
+    data_node = DataNode(epsilon_delta=(1,1))
+    data_node.set_private_data("test", np.array(range(10)))
+    with pytest.raises(ValueError):
+        data_node.configure_data_access("test", UnprotectedAccess())
