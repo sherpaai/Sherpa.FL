@@ -100,6 +100,16 @@ def test_exception_exceededprivacybudgeterror():
     with pytest.raises(ExceededPrivacyBudgetError):
         node.query("scalar")
         
+    try:
+        raise ExceededPrivacyBudgetError(epsilon_delta=(0, 1))
+    except ExceededPrivacyBudgetError as e:
+        assert str(e) == 'Error: Privacy Budget {} has been exceeded'.format((0,1))
+
+    try:
+        raise ExceededPrivacyBudgetError()
+    except ExceededPrivacyBudgetError as e:
+        assert str(e) == 'Error: Privacy Budget has been exceeded'
+
 def test_constructor_bad_params():
     with pytest.raises(ValueError):
         DataNode(epsilon_delta=(1,2,3))
@@ -116,11 +126,11 @@ def test_get_epsilon_delta():
     
     assert data_node.epsilon_delta == e_d
 
-def test_configure_data_access1():
+def test_configure_data_access():
     data_node = DataNode()
     data_node.set_private_data("test", np.array(range(10)))
     with pytest.raises(ValueError):
-        data_node.configure_data_access("test", GaussianMechanism(1, epsilon_delta=(1,1)))
+        data_node.configure_data_access("test", GaussianMechanism(1, epsilon_delta=(0.1,1)))
 
 def test_configure_data_access2():
     data_node = DataNode(epsilon_delta=(1,1))

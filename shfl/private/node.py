@@ -16,14 +16,13 @@ class ExceededPrivacyBudgetError(Exception):
     """
     def __init__(self, **args):
         self._epsilon_delta = None
-        self._message = None
         if args:
             if "epsilon_delta" in args:
                 self._epsilon_delta = args["epsilon_delta"]
 
     def __str__(self):
         if self._epsilon_delta:
-            return 'Error: Privacy Budget {} has been exceeded, {} '.format(self._message, self._epsilon_delta)
+            return 'Error: Privacy Budget {} has been exceeded'.format(self._epsilon_delta)
         else:
             return 'Error: Privacy Budget has been exceeded'
 
