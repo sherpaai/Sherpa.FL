@@ -1,0 +1,117 @@
+from shfl.learning_approach.federated_government import FederatedGovernment
+from shfl.federated_aggregator.fedavg_aggregator import FedAvgAggregator
+from shfl.data_distribution.data_distribution_iid import IidDataDistribution
+from shfl.data_distribution.data_distribution_non_iid import NonIidDataDistribution
+from shfl.private.federated_operation import apply_federated_transformation
+from shfl.private.federated_operation import FederatedTransformation
+from shfl.model.deep_learning_model import DeepLearningModel
+
+from enum import Enum
+import numpy as np
+import keras
+
+
+def model_builder():
+    model = keras.models.Sequential()
+    model.add(keras.layers.Conv2D(32, kernel_size=(3, 3), padding='same', activation='relu', strides=1,
+                                  input_shape=(28, 28, 1)))
+    model.add(keras.layers.MaxPooling2D(pool_size=2, strides=2, padding='valid'))
+    model.add(keras.layers.Dropout(0.4))
+    model.add(keras.layers.Conv2D(32, kernel_size=(3, 3), padding='same', activation='relu', strides=1))
+    model.add(keras.layers.MaxPooling2D(pool_size=2, strides=2, padding='valid'))
+    model.add(keras.layers.Dropout(0.3))
+    model.add(keras.layers.Flatten())
+    model.add(keras.layers.Dense(128, activation='relu'))
+    model.add(keras.layers.Dropout(0.1))
+    model.add(keras.layers.Dense(64, activation='relu'))
+    model.add(keras.layers.Dense(10, activation='softmax'))
+
+    model.compile(optimizer="rmsprop", loss="categorical_crossentropy", metrics=["accuracy"])
+
+    return DeepLearningModel(model)
+
+
+class Reshape(FederatedTransformation):
+    def apply(self, labeled_data):
+        labeled_data.data = np.reshape(labeled_data.data,
+                                       (labeled_data.data.shape[0], labeled_data.data.shape[1],
+                                        labeled_data.data.shape[2], 1))
+
+
+class Normalize(FederatedTransformation):
+    def __init__(self, mean, std):
+        self.__mean = mean
+        self.__std = std
+
+    def apply(self, labeled_data):
+        labeled_data.data = (labeled_data.data - self.__mean) / self.__std
+
+
+class ImagesDataBases(Enum):
+    """
+    Enumeration of possible databases for image classification.
+    """
+    EMNIST = "shfl.data_base.emnist.Emnist"
+    FASHION_EMNIST = "shfl.data_base.fashion_emnist.FashionMnist"
+
+
+class FederatedImagesClassifier(FederatedGovernment):
+    """
+    Class used to represent a high-level federated image classification
+    (see: [FederatedGoverment](../federated_goverment/#federatedgoverment-class)).
+
+    # Arguments:
+        data_base_name_key: key of the enumeration of valid data bases (see: [ImagesDataBases](./#imagesdatabases-class))
+        iid: boolean which specifies if the distribution if IID (True) or non-IID (False) (True by default)
+    """
+
+    def __init__(self, data_base_name_key, iid=True):
+        if data_base_name_key in ImagesDataBases.__members__.keys():
+            data_base_class_path = ImagesDataBases.__members__[data_base_name_key].value
+            data_base_class_fields = data_base_class_path.rsplit(".", 1)
+            module = __import__(data_base_class_fields[0], fromlist=data_base_class_fields[-1])
+            data_base = getattr(module, data_base_class_fields[-1])()
+            train_data, train_labels, val_data, val_labels, test_data, test_labels = data_base.load_data()
+
+            if iid:
+                distribution = IidDataDistribution(data_base)
+            else:
+                distribution = NonIidDataDistribution(data_base)
+
+            federated_data, self._test_data, self._test_labels = distribution.get_federated_data(num_nodes=20,
+                                                                                                 percent=50)
+            apply_federated_transformation(federated_data, Reshape())
+            mean = np.mean(train_data.data)
+            std = np.std(train_data.data)
+            apply_federated_transformation(federated_data, Normalize(mean, std))
+
+            aggregator = FedAvgAggregator()
+
+            super().__init__(model_builder, federated_data, aggregator)
+
+        else:
+            print("The data base name is not included. Try with: " + str(", ".join([e.name for e in ImagesDataBases])))
+            self._test_data = None
+
+    def run_rounds(self, n=2):
+        """
+        Overriding of the method of run_rounds of [FederatedGoverment](../federated_goverment/#federatedgoverment-class)).
+
+        Run one more round beginning in the actual state testing in test data and federated_local_test.
+
+        # Arguments:
+            n: Number of rounds (2 by default)
+        """
+        if self._test_data is not None:
+            self._test_data = np.reshape(self._test_data, (self._test_data.shape[0],
+                                                           self._test_data.shape[1], self._test_data.shape[2], 1))
+            for i in range(0, n):
+                print("Accuracy round " + str(i))
+                self.deploy_central_model()
+                self.train_all_clients()
+                self.evaluate_clients(self._test_data, self._test_labels)
+                self.aggregate_weights()
+                self.evaluate_global_model(self._test_data, self._test_labels)
+                print("\n\n")
+        else:
+            print("Federated images classifier is not properly initialised")
