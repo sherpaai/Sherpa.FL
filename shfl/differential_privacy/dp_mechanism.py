@@ -221,6 +221,7 @@ class GaussianMechanism(DPDataAccessDefinition):
 
         return data + np.random.normal(loc=0.0, scale=std, size=size)
 
+
 class ExponentialMechanism(DPDataAccessDefinition):
     """
     Implements the exponential mechanism differential privacy defined by Dwork in 
@@ -259,7 +260,7 @@ class ExponentialMechanism(DPDataAccessDefinition):
         
         return sample    
     
-    
+
 def _safety_checks(epsilon_delta):
     if len(epsilon_delta) != 2:
         raise ValueError("epsilon_delta parameter should be a tuple with two elements, but {} were given".format(len(epsilon_delta)))
