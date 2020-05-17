@@ -101,6 +101,11 @@ def test_exception_exceededprivacybudgeterror():
         node.query("scalar")
         
     try:
+        node.query("scalar")
+    except ExceededPrivacyBudgetError as e:
+        assert str(e) == 'Error: Privacy Budget {} has been exceeded for property {}'.format((1,0), "scalar")
+        
+    try:
         raise ExceededPrivacyBudgetError(epsilon_delta=(0, 1))
     except ExceededPrivacyBudgetError as e:
         assert str(e) == 'Error: Privacy Budget {} has been exceeded'.format((0,1))
@@ -110,6 +115,11 @@ def test_exception_exceededprivacybudgeterror():
     except ExceededPrivacyBudgetError as e:
         assert str(e) == 'Error: Privacy Budget has been exceeded'
 
+    try:
+        raise ExceededPrivacyBudgetError(property="scalar")
+    except ExceededPrivacyBudgetError as e:
+        assert str(e) == 'Error: Privacy Budget has been exceeded for property scalar'
+    
 def test_constructor_bad_params():
     with pytest.raises(ValueError):
         DataNode(epsilon_delta=(1,2,3))

@@ -16,13 +16,20 @@ class ExceededPrivacyBudgetError(Exception):
     """
     def __init__(self, **args):
         self._epsilon_delta = None
+        self._property = None
         if args:
             if "epsilon_delta" in args:
                 self._epsilon_delta = args["epsilon_delta"]
+            if "property" in args:
+                self._property = args["property"]
 
     def __str__(self):
-        if self._epsilon_delta:
+        if self._epsilon_delta and self._property:
+            return 'Error: Privacy Budget {} has been exceeded for property {}'.format(self._epsilon_delta, self._property)
+        elif self._epsilon_delta:
             return 'Error: Privacy Budget {} has been exceeded'.format(self._epsilon_delta)
+        elif self._property:
+            return 'Error: Privacy Budget has been exceeded for property {}'.format(self._property)
         else:
             return 'Error: Privacy Budget has been exceeded'
 
@@ -50,10 +57,10 @@ class DataNode:
         self._private_data = {}
         self._private_test_data = {}
         self._private_data_access_policies = {}
+        self._private_data_epsilon_delta_access_history = {}
         self._model = None
         self._model_access_policy = UnprotectedAccess()
         self._epsilon_delta = None
-        self._epsilon_delta_access_history = None
         if epsilon_delta is not None:
             if len(epsilon_delta) != 2:
                 raise ValueError("epsilon_delta parameter has to be a tuple or list of length 2, but {} were given".format(len(epsilon_delta)))
@@ -65,9 +72,9 @@ class DataNode:
                 raise ValueError("Delta has to be greater than zero")
     
 
-    def __basic_adaptive_comp_theorem(self):
+    def __basic_adaptive_comp_theorem(self, private_property):
         '''
-            It checks wether the privacy budget given by epsilon_delta is surpassed.
+            It checks whether the privacy budget given by epsilon_delta is surpassed.
             
             It implements the theorem 3.6 from Privacy Odometers and Filters: Pay-as-you-Go Composition.
             
@@ -79,13 +86,13 @@ class DataNode:
                 - [Privacy Odometers and Filters: Pay-as-you-Go Composition] (https://arxiv.org/abs/1605.08294)
         '''
         global_epsilon, global_delta = self._epsilon_delta
-        eps_sum, delta_sum = map(sum, zip(*self._epsilon_delta_access_history))
+        eps_sum, delta_sum = map(sum, zip(*self._private_data_epsilon_delta_access_history[private_property]))
         return eps_sum > global_epsilon or delta_sum > global_delta
 
 
-    def __advanced_adaptive_comp_theorem(self):
+    def __advanced_adaptive_comp_theorem(self, private_property):
         '''
-            It checks wether the privacy budget given by epsilon_delta is surpassed.
+            It checks whether the privacy budget given by epsilon_delta is surpassed.
             
             It implements the theorem 5.1 from Privacy Odometers and Filters: Pay-as-you-Go Composition.
             
@@ -96,7 +103,7 @@ class DataNode:
             # References:
                 - [Privacy Odometers and Filters: Pay-as-you-Go Composition] (https://arxiv.org/abs/1605.08294)
         '''
-        epsilon_history, delta_history = zip(*self._epsilon_delta_access_history)
+        epsilon_history, delta_history = zip(*self._private_data_epsilon_delta_access_history[private_property])
         global_epsilon, global_delta = self._epsilon_delta
         
         delta_sum = sum(delta_history)
@@ -197,6 +204,7 @@ class DataNode:
             raise ValueError("You can't access differentially private data with a non differentially private mechanism")
         
         self._private_data_access_policies[name] = copy.deepcopy(data_access_definition)
+        self._private_data_epsilon_delta_access_history[name] = []
 
 
     def configure_model_params_access(self, data_access_definition):
@@ -233,16 +241,14 @@ class DataNode:
         access_policy_eps_delta_available = hasattr(data_access_policy, 'epsilon_delta')
         
         if access_policy_eps_delta_available:
-            self._epsilon_delta_access_history.append(data_access_policy.epsilon_delta)
+            self._private_data_epsilon_delta_access_history[private_property].append(data_access_policy.epsilon_delta)
             
-            privacy_budget_exceeded = self.__basic_adaptive_comp_theorem()
-            print("1. {}".format(privacy_budget_exceeded))
+            privacy_budget_exceeded = self.__basic_adaptive_comp_theorem(private_property)
             if self._epsilon_delta[1] > 0 and self._epsilon_delta[1] < exp(-1):
-                privacy_budget_exceeded &= self.__advanced_adaptive_comp_theorem()
-                print("2. {}".format(privacy_budget_exceeded))
+                privacy_budget_exceeded &= self.__advanced_adaptive_comp_theorem(private_property)
             if privacy_budget_exceeded:
-                self._epsilon_delta_access_history.pop()
-                raise ExceededPrivacyBudgetError(epsilon_delta=self._epsilon_delta)
+                self._private_data_epsilon_delta_access_history[private_property].pop()
+                raise ExceededPrivacyBudgetError(property=private_property, epsilon_delta=self._epsilon_delta)
             else:
                 return data_access_policy.apply(self._private_data[private_property])
         else:
