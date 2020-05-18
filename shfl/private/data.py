@@ -53,7 +53,7 @@ class DPDataAccessDefinition(DataAccessDefinition):
     """
     
     @property
-    @abc.abstractclassmethod
+    @abc.abstractmethod
     def epsilon_delta(self):
         """
         Every differentially private mechanism needs to implement this property
