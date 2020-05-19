@@ -57,7 +57,7 @@ def test_deploy_central_model():
         node._model.set_model_params.assert_called_once_with(array_params)
 
 
-def test_get_client_accuracy():
+def test_evaluate_clients_global():
     model_builder = Mock
     aggregator = Mock()
     database = TestDataBase()
@@ -70,12 +70,35 @@ def test_get_client_accuracy():
     fdg = FederatedGovernment(model_builder, federated_data, aggregator)
 
     for node in fdg._federated_data:
-        node._model.evaluate.return_value = np.random.randint(0, 10, 40)
+        node.evaluate = Mock()
+        node.evaluate.return_value = [np.random.randint(0, 10, 40), None]
 
     fdg.evaluate_clients(test_data, test_labels)
 
     for node in fdg._federated_data:
-        node._model.evaluate.assert_called_once_with(test_data, test_labels)
+        node.evaluate.assert_called_once_with(test_data, test_labels)
+
+
+def test_evaluate_clients_local():
+    model_builder = Mock
+    aggregator = Mock()
+    database = TestDataBase()
+    database.load_data()
+    db = IidDataDistribution(database)
+
+    num_nodes = 3
+    federated_data, test_data, test_labels = db.get_federated_data(num_nodes)
+
+    fdg = FederatedGovernment(model_builder, federated_data, aggregator)
+
+    for node in fdg._federated_data:
+        node.evaluate = Mock()
+        node.evaluate.return_value = [np.random.randint(0, 10, 40), np.random.randint(0, 10, 40)]
+
+    fdg.evaluate_clients(test_data, test_labels)
+
+    for node in fdg._federated_data:
+        node.evaluate.assert_called_once_with(test_data, test_labels)
 
 
 def test_train_all_clients():
@@ -130,18 +153,19 @@ def test_run_rounds():
 
     fdg = FederatedGovernment(model_builder, federated_data, aggregator)
 
-    array_params = np.random.rand(30)
-    fdg._model.get_model_params.return_value = array_params
-
-    for node in fdg._federated_data:
-        node._model.predict.return_value = np.random.randint(0, 10, 40)
-
-    weights = np.random.rand(64, 32)
-    fdg._aggregator.aggregate_weights.return_value = weights
-
-    fdg._model.predict.return_value = np.random.randint(0, 10, 40)
+    fdg.deploy_central_model = Mock()
+    fdg.train_all_clients = Mock()
+    fdg.evaluate_clients = Mock()
+    fdg.aggregate_weights = Mock()
+    fdg.evaluate_global_model = Mock()
 
     fdg.run_rounds(1, test_data, test_labels)
+
+    fdg.deploy_central_model.assert_called_once()
+    fdg.train_all_clients.assert_called_once()
+    fdg.evaluate_clients.assert_called_once_with(test_data, test_labels)
+    fdg.aggregate_weights.assert_called_once()
+    fdg.evaluate_global_model.assert_called_once_with(test_data, test_labels)
 
 
 def test_run_rounds_local_tests():
@@ -158,15 +182,16 @@ def test_run_rounds_local_tests():
 
     fdg = FederatedGovernment(model_builder, federated_data, aggregator)
 
-    array_params = np.random.rand(30)
-    fdg._model.get_model_params.return_value = array_params
-
-    for node in fdg._federated_data:
-        node._model.predict.return_value = np.random.randint(0, 10, 40)
-
-    weights = np.random.rand(64, 32)
-    fdg._aggregator.aggregate_weights.return_value = weights
-
-    fdg._model.predict.return_value = np.random.randint(0, 10, 40)
+    fdg.deploy_central_model = Mock()
+    fdg.train_all_clients = Mock()
+    fdg.evaluate_clients = Mock()
+    fdg.aggregate_weights = Mock()
+    fdg.evaluate_global_model = Mock()
 
     fdg.run_rounds(1, test_data, test_labels)
+
+    fdg.deploy_central_model.assert_called_once()
+    fdg.train_all_clients.assert_called_once()
+    fdg.evaluate_clients.assert_called_once_with(test_data, test_labels)
+    fdg.aggregate_weights.assert_called_once()
+    fdg.evaluate_global_model.assert_called_once_with(test_data, test_labels)
