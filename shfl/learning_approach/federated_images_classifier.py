@@ -37,6 +37,8 @@ class FederatedImagesClassifier(FederatedGovernment):
     # Arguments:
         data_base_name_key: key of the enumeration of valid data bases (see: [ImagesDataBases](./#imagesdatabases-class))
         iid: boolean which specifies if the distribution if IID (True) or non-IID (False) (True by default)
+        num_nodes: number of clients.
+        percent: percentage of the database to distribute among nodes.
     """
 
     def __init__(self, data_base_name_key, iid=True, num_nodes=20, percent=100):
