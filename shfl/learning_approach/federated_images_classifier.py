@@ -7,6 +7,7 @@ from shfl.private.federated_operation import FederatedTransformation
 from shfl.model.deep_learning_model import DeepLearningModel
 from shfl.data_base.emnist import Emnist
 from shfl.data_base.fashion_mnist import FashionMnist
+from shfl.private.federated_operation import Normalize
 
 from enum import Enum
 import numpy as np
@@ -18,15 +19,6 @@ class Reshape(FederatedTransformation):
         labeled_data.data = np.reshape(labeled_data.data,
                                        (labeled_data.data.shape[0], labeled_data.data.shape[1],
                                         labeled_data.data.shape[2], 1))
-
-
-class Normalize(FederatedTransformation):
-    def __init__(self, mean, std):
-        self.__mean = mean
-        self.__std = std
-
-    def apply(self, labeled_data):
-        labeled_data.data = (labeled_data.data - self.__mean) / self.__std
 
 
 class ImagesDataBases(Enum):

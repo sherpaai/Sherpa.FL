@@ -191,3 +191,19 @@ def split_train_test(federated_data, test_split=0.2):
     for data_node in federated_data:
         data_node.split_train_test(test_split)
 
+
+class Normalize(FederatedTransformation):
+    """
+    Normalization class of federated data [FederatedData](./#federateddata-class). It implements \
+    [FederatedTransformation](./#federatedtransformation-class).
+
+    # Arguments:
+        mean: mean used for normalization.
+        std: std used for normalization.
+    """
+    def __init__(self, mean, std):
+        self.__mean = mean
+        self.__std = std
+
+    def apply(self, labeled_data):
+        labeled_data.data = (labeled_data.data - self.__mean) / self.__std
