@@ -5,30 +5,12 @@ from shfl.data_distribution.data_distribution_non_iid import NonIidDataDistribut
 from shfl.private.federated_operation import apply_federated_transformation
 from shfl.private.federated_operation import FederatedTransformation
 from shfl.model.deep_learning_model import DeepLearningModel
+from shfl.data_base.emnist import Emnist
+from shfl.data_base.fashion_mnist import FashionMnist
 
 from enum import Enum
 import numpy as np
 import keras
-
-
-def model_builder():
-    model = keras.models.Sequential()
-    model.add(keras.layers.Conv2D(32, kernel_size=(3, 3), padding='same', activation='relu', strides=1,
-                                  input_shape=(28, 28, 1)))
-    model.add(keras.layers.MaxPooling2D(pool_size=2, strides=2, padding='valid'))
-    model.add(keras.layers.Dropout(0.4))
-    model.add(keras.layers.Conv2D(32, kernel_size=(3, 3), padding='same', activation='relu', strides=1))
-    model.add(keras.layers.MaxPooling2D(pool_size=2, strides=2, padding='valid'))
-    model.add(keras.layers.Dropout(0.3))
-    model.add(keras.layers.Flatten())
-    model.add(keras.layers.Dense(128, activation='relu'))
-    model.add(keras.layers.Dropout(0.1))
-    model.add(keras.layers.Dense(64, activation='relu'))
-    model.add(keras.layers.Dense(10, activation='softmax'))
-
-    model.compile(optimizer="rmsprop", loss="categorical_crossentropy", metrics=["accuracy"])
-
-    return DeepLearningModel(model)
 
 
 class Reshape(FederatedTransformation):
@@ -51,8 +33,8 @@ class ImagesDataBases(Enum):
     """
     Enumeration of possible databases for image classification.
     """
-    EMNIST = "shfl.data_base.emnist.Emnist"
-    FASHION_EMNIST = "shfl.data_base.fashion_emnist.FashionMnist"
+    EMNIST = Emnist
+    FASHION_EMNIST = FashionMnist
 
 
 class FederatedImagesClassifier(FederatedGovernment):
@@ -65,12 +47,10 @@ class FederatedImagesClassifier(FederatedGovernment):
         iid: boolean which specifies if the distribution if IID (True) or non-IID (False) (True by default)
     """
 
-    def __init__(self, data_base_name_key, iid=True):
+    def __init__(self, data_base_name_key, iid=True, num_nodes=20, percent=100):
         if data_base_name_key in ImagesDataBases.__members__.keys():
-            data_base_class_path = ImagesDataBases.__members__[data_base_name_key].value
-            data_base_class_fields = data_base_class_path.rsplit(".", 1)
-            module = __import__(data_base_class_fields[0], fromlist=data_base_class_fields[-1])
-            data_base = getattr(module, data_base_class_fields[-1])()
+            module = ImagesDataBases.__members__[data_base_name_key].value
+            data_base = module()
             train_data, train_labels, val_data, val_labels, test_data, test_labels = data_base.load_data()
 
             if iid:
@@ -78,8 +58,8 @@ class FederatedImagesClassifier(FederatedGovernment):
             else:
                 distribution = NonIidDataDistribution(data_base)
 
-            federated_data, self._test_data, self._test_labels = distribution.get_federated_data(num_nodes=20,
-                                                                                                 percent=50)
+            federated_data, self._test_data, self._test_labels = distribution.get_federated_data(num_nodes=num_nodes,
+                                                                                                 percent=percent)
             apply_federated_transformation(federated_data, Reshape())
             mean = np.mean(train_data.data)
             std = np.std(train_data.data)
@@ -87,13 +67,13 @@ class FederatedImagesClassifier(FederatedGovernment):
 
             aggregator = FedAvgAggregator()
 
-            super().__init__(model_builder, federated_data, aggregator)
+            super().__init__(self.model_builder, federated_data, aggregator)
 
         else:
             print("The data base name is not included. Try with: " + str(", ".join([e.name for e in ImagesDataBases])))
             self._test_data = None
 
-    def run_rounds(self, n=2):
+    def run_rounds(self, n=5):
         """
         Overriding of the method of run_rounds of [FederatedGoverment](../federated_goverment/#federatedgoverment-class)).
 
@@ -115,3 +95,23 @@ class FederatedImagesClassifier(FederatedGovernment):
                 print("\n\n")
         else:
             print("Federated images classifier is not properly initialised")
+
+    @staticmethod
+    def model_builder():
+        model = keras.models.Sequential()
+        model.add(keras.layers.Conv2D(32, kernel_size=(3, 3), padding='same', activation='relu', strides=1,
+                                      input_shape=(28, 28, 1)))
+        model.add(keras.layers.MaxPooling2D(pool_size=2, strides=2, padding='valid'))
+        model.add(keras.layers.Dropout(0.4))
+        model.add(keras.layers.Conv2D(32, kernel_size=(3, 3), padding='same', activation='relu', strides=1))
+        model.add(keras.layers.MaxPooling2D(pool_size=2, strides=2, padding='valid'))
+        model.add(keras.layers.Dropout(0.3))
+        model.add(keras.layers.Flatten())
+        model.add(keras.layers.Dense(128, activation='relu'))
+        model.add(keras.layers.Dropout(0.1))
+        model.add(keras.layers.Dense(64, activation='relu'))
+        model.add(keras.layers.Dense(10, activation='softmax'))
+
+        model.compile(optimizer="rmsprop", loss="categorical_crossentropy", metrics=["accuracy"])
+
+        return DeepLearningModel(model)
