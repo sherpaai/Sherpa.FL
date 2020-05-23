@@ -6,6 +6,7 @@ from shfl.private.data import DPDataAccessDefinition
 from shfl.private.query import IdentityFunction
 from shfl.differential_privacy.dp_sampling import DefaultSampler
 
+
 class RandomizedResponseCoins(DPDataAccessDefinition):
     """
     This class uses a simple mechanism to add randomness for binary data. This algorithm is described
@@ -47,6 +48,7 @@ class RandomizedResponseCoins(DPDataAccessDefinition):
         Implements the two coin flip algorithm described by Dwork.
         """
         _check_binary_data(data)
+        data = self._sampling_method.sample(data)
         size = _get_data_size(data)
 
         first_coin_flip = np.random.rand(size) > self._prob_head_first
@@ -112,6 +114,7 @@ class RandomizedResponseBinary(DPDataAccessDefinition):
         Both the input and output of the method are binary arrays.
         """
         _check_binary_data(data)
+        data = self._sampling_method.sample(data)
         size = _get_data_size(data)
 
         if size > 1:
@@ -150,6 +153,9 @@ class LaplaceMechanism(DPDataAccessDefinition):
         query: Function to apply over private data (see: [Query](../../private/query)). This parameter is optional and \
             the identity function (see: [IdentityFunction](../../private/query/#identityfunction-class)) will be used \
             if it is not provided.
+        sampling_method: Sampling method to apply before querying data, this parameter is optional and \
+            the default function (see: [DefaultSampler](../../private/differential_privacy/#defaultsampler-class)) will be used \
+            if it is not provided.
 
     # References
         - [The algorithmic foundations of differential privacy](
@@ -172,7 +178,7 @@ class LaplaceMechanism(DPDataAccessDefinition):
         return self._epsilon, 0
     
     def apply(self, data):
-        query_result = self._query.get(data)
+        query_result = self._query.get(self._sampling_method.sample(data))
         size = _get_data_size(query_result)
         b = self._sensitivity/self._epsilon
 
@@ -224,7 +230,7 @@ class GaussianMechanism(DPDataAccessDefinition):
         return self._epsilon_delta
     
     def apply(self, data):
-        query_result = self._query.get(data)
+        query_result = self._query.get(self._sampling_method.sample(data))
         size = _get_data_size(query_result)
         std = sqrt(2 * np.log(1.25/self._epsilon_delta[1])) * self._sensitivity / self._epsilon_delta[0]
 
@@ -264,7 +270,7 @@ class ExponentialMechanism(DPDataAccessDefinition):
     
     def apply(self, data):
         r_range = self._r
-        u_points = self._u(data, r_range)
+        u_points = self._u(self._sampling_method.sample(data), r_range)
         p = np.exp(self._epsilon * u_points / (2 * self._delta_u))      
         p /= p.sum()
         sample = np.random.choice(a=r_range, size=self._size, replace=True, p=p)
