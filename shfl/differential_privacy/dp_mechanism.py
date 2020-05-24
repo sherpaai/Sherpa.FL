@@ -28,6 +28,9 @@ class RandomizedResponseCoins(DPDataAccessDefinition):
             This is equivalent to prob_head of the first coin flip algorithm described by Dwork.
         prob_head_second: float in [0,1] representing probability of respond true when random answer is provided.
             Equivalent to prob_head in the second coin flip in the algorithm.
+        sampling_method: Sampling method to apply before querying data, this parameter is optional and \
+            the default function (see: [DefaultSampler](../../private/differential_privacy/#defaultsampler-class)) will be used \
+            if it is not provided.
 
     # References
         - [The algorithmic foundations of differential privacy](
@@ -83,7 +86,10 @@ class RandomizedResponseBinary(DPDataAccessDefinition):
     # Arguments
         f0: float in [0,1] representing the probability of getting 0 when the input is 0
         f1: float in [0,1] representing the probability of getting 1 when the input is 1
-        
+        sampling_method: Sampling method to apply before querying data, this parameter is optional and \
+            the default function (see: [DefaultSampler](../../private/differential_privacy/#defaultsampler-class)) will be used \
+            if it is not provided.
+
     # References
         - [Using Randomized Response for Differential PrivacyPreserving Data Collection](http://csce.uark.edu/~xintaowu/publ/DPL-2014-003.pdf)
     """
@@ -209,6 +215,9 @@ class GaussianMechanism(DPDataAccessDefinition):
         query: Function to apply over private data (see: [Query](../../private/query)). This parameter is optional and \
             the identity function (see: [IdentityFunction](../../private/query/#identityfunction-class)) will be used \
             if it is not provided.
+        sampling_method: Sampling method to apply before querying data, this parameter is optional and \
+            the default function (see: [DefaultSampler](../../private/differential_privacy/#defaultsampler-class)) will be used \
+            if it is not provided.
 
     # References
         - [The algorithmic foundations of differential privacy](
@@ -250,7 +259,10 @@ class ExponentialMechanism(DPDataAccessDefinition):
         delta_u: float for the sensitivity of the utility function.
         epsilon: float for the epsilon you want to apply.
         size: integer for the number of queries to perform at once. If not given it defaults to one.
-        
+        sampling_method: Sampling method to apply before querying data, this parameter is optional and \
+            the default function (see: [DefaultSampler](../../private/differential_privacy/#defaultsampler-class)) will be used \
+            if it is not provided.
+
     # References
         - [The algorithmic foundations of differential privacy](
            https://www.cis.upenn.edu/~aaroth/Papers/privacybook.pdf)

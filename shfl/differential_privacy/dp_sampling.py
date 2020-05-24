@@ -41,7 +41,9 @@ class Sampler():
 
 
 class DefaultSampler(Sampler):
-
+    """
+        Default sampler implementation
+    """
     def __init__(self):
         pass
 
@@ -53,6 +55,17 @@ class DefaultSampler(Sampler):
 
 
 class SampleWithReplacement(Sampler):
+    """
+        It implements the sample with replacement technique (Theorem 10 from the reference) which reduces
+        the epsilon-delta bugdet spent specified
+    
+        # Arguments:
+            sample_size: size of the sample
+            data_size: size of the input data
+        
+        # References:
+            - [Privacy Amplification by Subsampling: Tight Analyses via Couplings and Divergences](https://arxiv.org/abs/1807.01647)
+    """
 
     def __init__(self, sample_size, data_size):
         check_sample_size(sample_size, data_size)
@@ -76,6 +89,17 @@ class SampleWithReplacement(Sampler):
 
 
 class SampleWithoutReplacement(Sampler):
+    """
+        It implements the sample with replacement technique (Theorem 9 from the reference) which reduces
+        the epsilon-delta bugdet spent specified
+    
+        # Arguments:
+            sample_size: size of the sample
+            data_size: size of the input data
+        
+        # References:
+            - [Privacy Amplification by Subsampling: Tight Analyses via Couplings and Divergences](https://arxiv.org/abs/1807.01647)
+    """
 
     def __init__(self, sample_size, data_size):
         check_sample_size(sample_size, data_size)
