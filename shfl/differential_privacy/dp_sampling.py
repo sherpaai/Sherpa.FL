@@ -2,6 +2,7 @@ import abc
 from math import log
 from math import exp
 from scipy.special import comb
+import numpy as np
 
 
 class Sampler():
@@ -53,7 +54,7 @@ class DefaultSampler(Sampler):
 
 class SampleWithReplacement(Sampler):
 
-    def __init__(sample_size, data_size):
+    def __init__(self, sample_size, data_size):
         check_sample_size(sample_size, data_size)
         self._sample_size = sample_size
         self._data_size = data_size
@@ -76,7 +77,7 @@ class SampleWithReplacement(Sampler):
 
 class SampleWithoutReplacement(Sampler):
 
-    def __init__(sample_size):
+    def __init__(self, sample_size, data_size):
         check_sample_size(sample_size, data_size)
         self._sample_size = sample_size
         self._data_size = data_size
@@ -96,4 +97,4 @@ class SampleWithoutReplacement(Sampler):
 
 def check_sample_size(sample_size, data_size):
     if sample_size > data_size:
-        raise ValueError("Sample size {} must be less than data size: {}".format(sample_size, size))
+        raise ValueError("Sample size {} must be less than data size: {}".format(sample_size, data_size))

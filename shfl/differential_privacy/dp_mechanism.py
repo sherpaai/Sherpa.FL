@@ -1,6 +1,7 @@
 import numpy as np
 import scipy
-from math import sqrt, log
+from math import sqrt
+from math import log
 
 from shfl.private.data import DPDataAccessDefinition
 from shfl.private.query import IdentityFunction
@@ -182,7 +183,7 @@ class LaplaceMechanism(DPDataAccessDefinition):
         size = _get_data_size(query_result)
         b = self._sensitivity/self._epsilon
 
-        return data + np.random.laplace(loc=0.0, scale=b, size=size)
+        return query_result + np.random.laplace(loc=0.0, scale=b, size=size)
 
 
 class GaussianMechanism(DPDataAccessDefinition):
@@ -234,7 +235,7 @@ class GaussianMechanism(DPDataAccessDefinition):
         size = _get_data_size(query_result)
         std = sqrt(2 * np.log(1.25/self._epsilon_delta[1])) * self._sensitivity / self._epsilon_delta[0]
 
-        return data + np.random.normal(loc=0.0, scale=std, size=size)
+        return query_result + np.random.normal(loc=0.0, scale=std, size=size)
 
 
 class ExponentialMechanism(DPDataAccessDefinition):
