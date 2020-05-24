@@ -76,13 +76,15 @@ class SampleWithReplacement(Sampler):
         return np.random.choice(data, self._sample_size, replace=True)
 
     def epsilon_delta_reduction(self, epsilon_delta):
-        proportion = 1 - (1 - 1/self._data_size)**self._sample_size
+        proportion = 1 - (1 - 1 / self._data_size) ** self._sample_size
         epsilon, delta = epsilon_delta
 
-        new_epsilon = log(1+proportion*(exp(epsilon)-1))
+        new_epsilon = log(1 + proportion * (exp(epsilon) - 1))
         n = self._data_size
         m = self._sample_size
-        new_delta = sum([comb(m, k) * ((1 / n) ** k) * ((1 - 1 / n) ** (m - k)) for k in range(1, m+1)])
+        new_delta = 0
+        for k in range(1, m + 1):
+            new_delta += comb(m, k) * ((1 / n) ** k) * ((1 - 1 / n) ** (m - k))
         new_delta *= delta
 
         return new_epsilon, new_delta
@@ -110,11 +112,11 @@ class SampleWithoutReplacement(Sampler):
         return np.random.choice(data, self._sample_size, replace=False)
 
     def epsilon_delta_reduction(self, epsilon_delta):
-        proportion = self._sample_size/self._data_size
+        proportion = self._sample_size / self._data_size
         epsilon, delta = epsilon_delta
 
-        new_epsilon = log(1+proportion*(exp(epsilon)-1))
-        new_delta = proportion*delta
+        new_epsilon = log(1 + proportion * (exp(epsilon) - 1))
+        new_delta = proportion * delta
 
         return new_epsilon, new_delta
 
