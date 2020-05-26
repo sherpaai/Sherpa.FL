@@ -1,10 +1,12 @@
 import numpy as np
 import pytest
 from keras.utils import to_categorical
+from unittest.mock import Mock, patch
 
 import shfl.private.federated_operation
 from shfl.private.federated_operation import FederatedTransformation
 from shfl.private.federated_operation import FederatedData
+from shfl.private.federated_operation import FederatedDataNode
 from shfl.private.data import UnprotectedAccess, LabeledData
 
 
@@ -92,3 +94,26 @@ def test_split_train_test():
         raw_node.split_train_test()
         assert raw_node.private_data == split_node.private_data
         assert raw_node.private_test_data == split_node.private_test_data
+
+
+@patch("shfl.private.federated_operation.DataNode.evaluate")
+@patch("shfl.private.federated_operation.DataNode.local_evaluate")
+def test_evaluate(mock_super_local_evaluate, mock_super_evaluate):
+    data = np.random.rand(15)
+    test = np.random.rand(5)
+
+    identifier = 'id'
+    fdn = FederatedDataNode(identifier)
+
+    mock_super_evaluate.return_value = 10
+    mock_super_local_evaluate.return_value = 15
+
+    evaluate, local_evaluate = fdn.evaluate(data, test)
+
+    assert evaluate == 10
+    assert local_evaluate == 15
+
+    mock_super_evaluate.assert_called_once_with(data, test)
+    mock_super_local_evaluate.assert_called_once_with(identifier)
+
+

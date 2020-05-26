@@ -88,3 +88,46 @@ def test_set_params():
     data_node.model = model_mock
     data_node.set_model_params(random_array)
     model_mock.set_model_params.assert_called_once_with(random_array)
+
+
+def test_evaluate():
+    data = np.random.rand(60).reshape((15, 4))
+    labels = np.random.randint(0, 2, 15)
+
+    data_node = DataNode()
+    data_node._model = Mock()
+
+    data_node.evaluate(data, labels)
+
+    data_node._model.evaluate.assert_called_once_with(data, labels)
+
+
+def test_local_evaluate():
+    data_key = 'EMNIST'
+    data_node = DataNode()
+    data_node._private_test_data = Mock()
+
+    data = Mock()
+    data.data = np.random.rand(60)
+    data.label = np.random.randint(0, 2, 60)
+    data_node._private_test_data.get.return_value = data
+
+    data_node._model = Mock()
+    data_node._model.evaluate.return_value = 0
+
+    data_node.self_private_test_data = 1
+
+    eval = data_node.local_evaluate(data_key)
+
+    assert eval == 0
+    data_node._private_test_data.get.assert_called_once_with(data_key)
+    data_node._model.evaluate.assert_called_once_with(data.data, data.label)
+
+
+def test_local_evaluate_wrong():
+    data_node = DataNode()
+    data_node.self_private_test_data = 0
+
+    eval = data_node.local_evaluate('id')
+
+    assert eval is None
