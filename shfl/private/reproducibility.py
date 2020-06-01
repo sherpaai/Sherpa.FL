@@ -1,5 +1,6 @@
 import random
 import numpy as np
+import tensorflow as tf
 
 
 class Reproducibility:
@@ -69,6 +70,8 @@ class Reproducibility:
             self.__seeds[id] = np.random.randint(2**32-1)
         np.random.seed(self.__seeds[id])
         random.seed(self.__seeds[id])
+        tf.random.set_seed(self.__seeds[id])
+
 
     @property
     def seed(self):
