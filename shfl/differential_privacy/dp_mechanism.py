@@ -5,7 +5,6 @@ from math import log
 
 from shfl.private.data import DPDataAccessDefinition
 from shfl.private.query import IdentityFunction
-from shfl.differential_privacy.dp_sampling import DefaultSampler
 
 
 class RandomizedResponseCoins(DPDataAccessDefinition):
@@ -36,12 +35,10 @@ class RandomizedResponseCoins(DPDataAccessDefinition):
         - [The algorithmic foundations of differential privacy](
            https://www.cis.upenn.edu/~aaroth/Papers/privacybook.pdf)
     """
-    def __init__(self, prob_head_first=0.5, prob_head_second=0.5, sampling_method=DefaultSampler()):
+    def __init__(self, prob_head_first=0.5, prob_head_second=0.5):
         self._prob_head_first = prob_head_first
         self._prob_head_second = prob_head_second
         self._epsilon_delta = (log(3), 0)
-        self._sampling_method = sampling_method
-        self._epsilon_delta = self._sampling_method.epsilon_delta_reduction(self._epsilon_delta)
 
     @property
     def epsilon_delta(self):
@@ -52,7 +49,6 @@ class RandomizedResponseCoins(DPDataAccessDefinition):
         Implements the two coin flip algorithm described by Dwork.
         """
         _check_binary_data(data)
-        data = self._sampling_method.sample(data)
         size = _get_data_size(data)
 
         first_coin_flip = np.random.rand(size) > self._prob_head_first
@@ -94,7 +90,7 @@ class RandomizedResponseBinary(DPDataAccessDefinition):
         - [Using Randomized Response for Differential PrivacyPreserving Data Collection](http://csce.uark.edu/~xintaowu/publ/DPL-2014-003.pdf)
     """
 
-    def __init__(self, f0, f1, epsilon, sampling_method=DefaultSampler()):
+    def __init__(self, f0, f1, epsilon):
         check_epsilon_delta((epsilon, 0))
         if f0 <= 0 or f0 >= 1:
             raise ValueError("f0 argument must be between 0 an 1, {} was provided".format(f0))
@@ -107,8 +103,6 @@ class RandomizedResponseBinary(DPDataAccessDefinition):
         self._f0 = f0
         self._f1 = f1
         self._epsilon = epsilon
-        self._sampling_method = sampling_method
-        self._epsilon, _ = self._sampling_method.epsilon_delta_reduction((self._epsilon, 0))
 
     @property
     def epsilon_delta(self):
@@ -121,7 +115,6 @@ class RandomizedResponseBinary(DPDataAccessDefinition):
         Both the input and output of the method are binary arrays.
         """
         _check_binary_data(data)
-        data = self._sampling_method.sample(data)
         size = _get_data_size(data)
 
         if size > 1:
@@ -168,7 +161,7 @@ class LaplaceMechanism(DPDataAccessDefinition):
         - [The algorithmic foundations of differential privacy](
            https://www.cis.upenn.edu/~aaroth/Papers/privacybook.pdf)
     """
-    def __init__(self, sensitivity, epsilon, query=None, sampling_method=DefaultSampler()):
+    def __init__(self, sensitivity, epsilon, query=None):
         check_epsilon_delta((epsilon, 0))
         
         if query is None:
@@ -177,15 +170,13 @@ class LaplaceMechanism(DPDataAccessDefinition):
         self._sensitivity = sensitivity
         self._epsilon = epsilon
         self._query = query
-        self._sampling_method = sampling_method
-        self._epsilon, _ = self._sampling_method.epsilon_delta_reduction((self._epsilon, 0))
 
     @property
     def epsilon_delta(self):
         return self._epsilon, 0
     
     def apply(self, data):
-        query_result = self._query.get(self._sampling_method.sample(data))
+        query_result = self._query.get(data)
         size = _get_data_size(query_result)
         b = self._sensitivity/self._epsilon
 
@@ -223,7 +214,7 @@ class GaussianMechanism(DPDataAccessDefinition):
         - [The algorithmic foundations of differential privacy](
            https://www.cis.upenn.edu/~aaroth/Papers/privacybook.pdf)
     """
-    def __init__(self, sensitivity, epsilon_delta, query=None, sampling_method=DefaultSampler()):
+    def __init__(self, sensitivity, epsilon_delta, query=None):
         check_epsilon_delta(epsilon_delta)
         if epsilon_delta[0] >= 1:
             raise ValueError("In the Gaussian mechanism epsilon have to be greater than 0 and less than 1")
@@ -232,15 +223,13 @@ class GaussianMechanism(DPDataAccessDefinition):
         self._sensitivity = sensitivity
         self._epsilon_delta = epsilon_delta
         self._query = query
-        self._sampling_method = sampling_method
-        self._epsilon_delta= self._sampling_method.epsilon_delta_reduction(self._epsilon_delta)
 
     @property
     def epsilon_delta(self):
         return self._epsilon_delta
     
     def apply(self, data):
-        query_result = self._query.get(self._sampling_method.sample(data))
+        query_result = self._query.get(data)
         size = _get_data_size(query_result)
         std = sqrt(2 * np.log(1.25/self._epsilon_delta[1])) * self._sensitivity / self._epsilon_delta[0]
 
@@ -267,15 +256,14 @@ class ExponentialMechanism(DPDataAccessDefinition):
         - [The algorithmic foundations of differential privacy](
            https://www.cis.upenn.edu/~aaroth/Papers/privacybook.pdf)
     """
-    def __init__(self, u, r, delta_u, epsilon, size=1, sampling_method=DefaultSampler()):
+    def __init__(self, u, r, delta_u, epsilon, size=1):
         check_epsilon_delta((epsilon, 0))
         self._u = u
         self._r = r
         self._delta_u = delta_u
         self._epsilon = epsilon
         self._size = size
-        self._sampling_method = sampling_method
-        self._epsilon, _ = self._sampling_method.epsilon_delta_reduction((epsilon, 0))
+
     
     @property
     def epsilon_delta(self):
@@ -283,7 +271,7 @@ class ExponentialMechanism(DPDataAccessDefinition):
     
     def apply(self, data):
         r_range = self._r
-        u_points = self._u(self._sampling_method.sample(data), r_range)
+        u_points = self._u(data, r_range)
         p = np.exp(self._epsilon * u_points / (2 * self._delta_u))      
         p /= p.sum()
         sample = np.random.choice(a=r_range, size=self._size, replace=True, p=p)

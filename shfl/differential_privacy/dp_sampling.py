@@ -4,8 +4,10 @@ from math import exp
 from scipy.special import comb
 import numpy as np
 
+from shfl.private.data import DPDataAccessDefinition
 
-class Sampler():
+
+class Sampler(DPDataAccessDefinition):
     """
     This class implements sampling methods which helps to reduce
     the epsilon-delta budget spent by a dp-mechanism
@@ -13,6 +15,17 @@ class Sampler():
     # Arguments:
         sample_size: size of the sample to be taken
     """
+
+    def __init__(self, dp_mechanism):
+        self._dp_mechanism = dp_mechanism
+
+    def apply(self, data):
+        sampled_data = self.sample(data)
+        return self._dp_mechanism.apply(sampled_data)
+
+    @property
+    def epsilon_delta(self):
+        return self.epsilon_delta_reduction(self._dp_mechanism.epsilon_delta)
 
     @abc.abstractmethod
     def epsilon_delta_reduction(self, epsilon_delta):
@@ -40,20 +53,6 @@ class Sampler():
         """
 
 
-class DefaultSampler(Sampler):
-    """
-        Default sampler implementation
-    """
-    def __init__(self):
-        pass
-
-    def sample(self, data):
-        return data
-
-    def epsilon_delta_reduction(self, epsilon_delta):
-        return epsilon_delta
-
-
 class SampleWithReplacement(Sampler):
     """
         It implements the sample with replacement technique (Theorem 10 from the reference) which reduces
@@ -67,8 +66,10 @@ class SampleWithReplacement(Sampler):
             - [Privacy Amplification by Subsampling: Tight Analyses via Couplings and Divergences](https://arxiv.org/abs/1807.01647)
     """
 
-    def __init__(self, sample_size, data_size):
+    def __init__(self, dp_mechanism, sample_size, data_size):
+        super().__init__(dp_mechanism)
         check_sample_size(sample_size, data_size)
+        self._dp_mechanism = dp_mechanism
         self._sample_size = sample_size
         self._data_size = data_size
 
@@ -103,8 +104,10 @@ class SampleWithoutReplacement(Sampler):
             - [Privacy Amplification by Subsampling: Tight Analyses via Couplings and Divergences](https://arxiv.org/abs/1807.01647)
     """
 
-    def __init__(self, sample_size, data_size):
+    def __init__(self, dp_mechanism, sample_size, data_size):
+        super().__init__(dp_mechanism)
         check_sample_size(sample_size, data_size)
+        self._dp_mechanism = dp_mechanism
         self._sample_size = sample_size
         self._data_size = data_size
 
