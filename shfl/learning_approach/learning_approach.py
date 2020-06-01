@@ -20,6 +20,10 @@ class LearningApproach(abc.ABC):
             if model_params_access is not None:
                 data_node.configure_model_params_access(model_params_access)
 
+    @property
+    def global_model(self):
+        return self._model
+
     @abc.abstractmethod
     def train_all_clients(self):
         """

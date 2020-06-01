@@ -46,6 +46,6 @@ def test_learning_approach_private_data():
     for node in la._federated_data:
         assert isinstance(node._model, model_builder)
 
-    assert isinstance(la._model, model_builder)
+    assert isinstance(la.global_model, model_builder)
     assert aggregator.id == la._aggregator.id
 
