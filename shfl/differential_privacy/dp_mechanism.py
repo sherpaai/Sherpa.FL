@@ -21,7 +21,7 @@ class RandomizedResponseCoins(DPDataAccessDefinition):
     Input data must be binary, otherwise exception will be raised.
 
     This method is log(3)-differentially private
-    
+
     # Arguments
         prob_head_first: float in [0,1] representing probability to use a random response instead of true value.
             This is equivalent to prob_head of the first coin flip algorithm described by Dwork.
@@ -32,6 +32,7 @@ class RandomizedResponseCoins(DPDataAccessDefinition):
         - [The algorithmic foundations of differential privacy](
            https://www.cis.upenn.edu/~aaroth/Papers/privacybook.pdf)
     """
+
     def __init__(self, prob_head_first=0.5, prob_head_second=0.5):
         self._prob_head_first = prob_head_first
         self._prob_head_second = prob_head_second
@@ -40,7 +41,7 @@ class RandomizedResponseCoins(DPDataAccessDefinition):
     @property
     def epsilon_delta(self):
         return self._epsilon_delta
-    
+
     def apply(self, data):
         """
         Implements the two coin flip algorithm described by Dwork.
@@ -51,7 +52,8 @@ class RandomizedResponseCoins(DPDataAccessDefinition):
         first_coin_flip = np.random.rand(size) > self._prob_head_first
         second_coin_flip = np.random.rand(size) < self._prob_head_second
 
-        result = data * first_coin_flip + (1 - first_coin_flip) * second_coin_flip
+        result = data * first_coin_flip + \
+            (1 - first_coin_flip) * second_coin_flip
 
         if np.isscalar(data):
             result = int(result)
@@ -73,7 +75,7 @@ class RandomizedResponseBinary(DPDataAccessDefinition):
     This class contains, for special cases of f0, f1, the class RandomizedResponseCoins.
     This algorithm is epsilon-differentially private if epsilon >= log max{ p00/p01, p11/p10} = log \
     max { f0/(1-f1), f1/(1-f0)}
-    
+
     Input data must be binary, otherwise exception will be raised.
 
     # Arguments
@@ -87,9 +89,11 @@ class RandomizedResponseBinary(DPDataAccessDefinition):
     def __init__(self, f0, f1, epsilon):
         check_epsilon_delta((epsilon, 0))
         if f0 <= 0 or f0 >= 1:
-            raise ValueError("f0 argument must be between 0 an 1, {} was provided".format(f0))
+            raise ValueError(
+                "f0 argument must be between 0 an 1, {} was provided".format(f0))
         if f1 <= 0 or f1 >= 1:
-            raise ValueError("f1 argument must be between 0 an 1, {} was provided".format(f1))
+            raise ValueError(
+                "f1 argument must be between 0 an 1, {} was provided".format(f1))
         if epsilon < log(max(f0 / (1 - f1), f1 / (1 - f0))):
             raise ValueError("To ensure epsilon differential privacy, the following inequality mus be satisfied " +
                              "{}=epsilon >= {}=log max ( f0 / (1 - f1), f1 / (1 - f0))"
@@ -101,7 +105,7 @@ class RandomizedResponseBinary(DPDataAccessDefinition):
     @property
     def epsilon_delta(self):
         return self._epsilon, 0
-    
+
     def apply(self, data):
         """
         Implements the general binary randomized response algorithm.
@@ -115,12 +119,15 @@ class RandomizedResponseBinary(DPDataAccessDefinition):
             # Binary array case
             x_response = np.zeros(size)
             x_zero = data == 0
-            x_response[x_zero] = scipy.stats.bernoulli.rvs(1 - self._f0, size=sum(x_zero))
-            x_response[~x_zero] = scipy.stats.bernoulli.rvs(self._f1, size=len(data)-sum(x_zero))
+            x_response[x_zero] = scipy.stats.bernoulli.rvs(
+                1 - self._f0, size=sum(x_zero))
+            x_response[~x_zero] = scipy.stats.bernoulli.rvs(
+                self._f1, size=len(data) - sum(x_zero))
         else:
             # Scalar case
             if data == 0:
-                x_response = int(scipy.stats.bernoulli.rvs(1 - self._f0, size=1))
+                x_response = int(
+                    scipy.stats.bernoulli.rvs(1 - self._f0, size=1))
             else:
                 x_response = int(scipy.stats.bernoulli.rvs(self._f1, size=1))
 
@@ -152,9 +159,10 @@ class LaplaceMechanism(DPDataAccessDefinition):
         - [The algorithmic foundations of differential privacy](
            https://www.cis.upenn.edu/~aaroth/Papers/privacybook.pdf)
     """
+
     def __init__(self, sensitivity, epsilon, query=None):
         check_epsilon_delta((epsilon, 0))
-        
+
         if query is None:
             query = IdentityFunction()
 
@@ -165,11 +173,11 @@ class LaplaceMechanism(DPDataAccessDefinition):
     @property
     def epsilon_delta(self):
         return self._epsilon, 0
-    
+
     def apply(self, data):
         query_result = self._query.get(data)
         size = _get_data_size(query_result)
-        b = self._sensitivity/self._epsilon
+        b = self._sensitivity / self._epsilon
 
         return query_result + np.random.laplace(loc=0.0, scale=b, size=size)
 
@@ -202,10 +210,12 @@ class GaussianMechanism(DPDataAccessDefinition):
         - [The algorithmic foundations of differential privacy](
            https://www.cis.upenn.edu/~aaroth/Papers/privacybook.pdf)
     """
+
     def __init__(self, sensitivity, epsilon_delta, query=None):
         check_epsilon_delta(epsilon_delta)
         if epsilon_delta[0] >= 1:
-            raise ValueError("In the Gaussian mechanism epsilon have to be greater than 0 and less than 1")
+            raise ValueError(
+                "In the Gaussian mechanism epsilon have to be greater than 0 and less than 1")
         if query is None:
             query = IdentityFunction()
         self._sensitivity = sensitivity
@@ -215,11 +225,12 @@ class GaussianMechanism(DPDataAccessDefinition):
     @property
     def epsilon_delta(self):
         return self._epsilon_delta
-    
+
     def apply(self, data):
         query_result = self._query.get(data)
         size = _get_data_size(query_result)
-        std = sqrt(2 * np.log(1.25/self._epsilon_delta[1])) * self._sensitivity / self._epsilon_delta[0]
+        std = sqrt(
+            2 * np.log(1.25 / self._epsilon_delta[1])) * self._sensitivity / self._epsilon_delta[0]
 
         return query_result + np.random.normal(loc=0.0, scale=std, size=size)
 
@@ -228,7 +239,7 @@ class ExponentialMechanism(DPDataAccessDefinition):
     """
     Implements the exponential mechanism differential privacy defined by Dwork in 
     "The algorithmic Foundations of Differential Privacy".
-    
+
     # Arguments:
         u: utility function with arguments x and r. It should be vectorized, so that for a \
         particular database x, it returns as many values as given in r.
@@ -241,6 +252,7 @@ class ExponentialMechanism(DPDataAccessDefinition):
         - [The algorithmic foundations of differential privacy](
            https://www.cis.upenn.edu/~aaroth/Papers/privacybook.pdf)
     """
+
     def __init__(self, u, r, delta_u, epsilon, size=1):
         check_epsilon_delta((epsilon, 0))
         self._u = u
@@ -252,16 +264,17 @@ class ExponentialMechanism(DPDataAccessDefinition):
     @property
     def epsilon_delta(self):
         return self._epsilon, 0
-    
+
     def apply(self, data):
         r_range = self._r
         u_points = self._u(data, r_range)
-        p = np.exp(self._epsilon * u_points / (2 * self._delta_u))      
+        p = np.exp(self._epsilon * u_points / (2 * self._delta_u))
         p /= p.sum()
-        sample = np.random.choice(a=r_range, size=self._size, replace=True, p=p)
-        
-        return sample    
-    
+        sample = np.random.choice(
+            a=r_range, size=self._size, replace=True, p=p)
+
+        return sample
+
 
 def check_epsilon_delta(epsilon_delta):
     if len(epsilon_delta) != 2:
@@ -275,9 +288,9 @@ def check_epsilon_delta(epsilon_delta):
 
 def _get_data_size(data):
     if np.isscalar(data):
-        size = 1
+        size = (1,)
     else:
-        size = len(data)
+        size = data.shape
 
     return size
 
@@ -285,7 +298,8 @@ def _get_data_size(data):
 def _check_binary_data(data):
     if np.isscalar(data):
         if data != 0 and data != 1:
-            raise ValueError("Randomized mechanism works with binary scalars, but input is not binary")
+            raise ValueError(
+                "Randomized mechanism works with binary scalars, but input is not binary")
     elif not np.array_equal(data, data.astype(bool)):
-        raise ValueError("Randomized mechanism works with binary data, but input is not binary")
-
+        raise ValueError(
+            "Randomized mechanism works with binary data, but input is not binary")
