@@ -22,7 +22,6 @@ class WeightedFedAvgAggregator(FederatedAggregator):
 
         num_clients = clients_params_array.shape[0]
         num_layers = clients_params_array.shape[1]
-        clients_params_array = clients_params_array.reshape(num_clients, num_layers)
 
         ponderated_weights = np.array([self._percentage[client] * clients_params_array[client, :] for client in range(num_clients)])
         aggregated_weights = np.array([np.sum(ponderated_weights[:, layer], axis=0) for layer in range(num_layers)])

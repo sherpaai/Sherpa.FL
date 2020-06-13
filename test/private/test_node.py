@@ -141,3 +141,17 @@ def test_local_evaluate_wrong():
     eval = data_node.local_evaluate('id')
 
     assert eval is None
+
+
+def test_performance():
+    data_node = DataNode()
+    data_node._model = Mock()
+    data_node._model.performance.return_value = 0
+
+    data = np.random.rand(25).reshape((5, 5))
+    labels = np.random.randint(0, 2, 5)
+
+    res = data_node.performance(data, labels)
+
+    data_node._model.performance.assert_called_once_with(data, labels)
+    assert res == 0

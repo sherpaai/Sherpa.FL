@@ -182,3 +182,30 @@ def test_set_model_params_zeros_array(mock_kmeans):
     assert n_init == kmm._n_init
     assert n_features == kmm._n_features
     assert np.array_equal(np.zeros((params.shape[0], n_features)), kmm._k_means.cluster_centers_)
+
+
+@patch('shfl.model.kmeans_model.metrics.v_measure_score')
+@patch('shfl.model.kmeans_model.KMeans')
+def test_performance(mock_kmeans, mock_v_measure_score):
+    model = Mock()
+    mock_kmeans.return_value = model
+    mock_v_measure_score.return_value = 0
+
+    n_clusters = 5
+    n_features = 5
+    init = 'k-means++'
+    n_init = 10
+    kmm = KMeansModel(n_clusters, n_features, init, n_init)
+
+    data = np.random.rand(25).reshape((5, 5))
+    labels = np.random.randint(0, 2, 5)
+    kmm.predict = Mock()
+    prediction = ~labels
+    kmm.predict.return_value = prediction
+
+    res = kmm.performance(data, labels)
+
+    assert res == 0
+    mock_v_measure_score.assert_called_once_with(labels, prediction)
+    kmm.predict.assert_called_once_with(data)
+

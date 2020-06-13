@@ -1,6 +1,7 @@
 from tensorflow.keras.datasets import fashion_mnist
-
 from shfl.data_base.data_base import DataBase
+
+import tensorflow as tf
 
 
 class FashionMnist(DataBase):
@@ -21,6 +22,9 @@ class FashionMnist(DataBase):
             all_data : train data, train label, test data and test labels
         """
         ((self._train_data, self._train_labels), (self._test_data, self._test_labels)) = fashion_mnist.load_data()
+
+        self._train_labels = tf.keras.utils.to_categorical(self._train_labels)
+        self._test_labels = tf.keras.utils.to_categorical(self._test_labels)
 
         self.shuffle()
         

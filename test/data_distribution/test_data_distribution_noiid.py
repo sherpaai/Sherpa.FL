@@ -70,7 +70,7 @@ def test_make_data_federated():
     #assert all_data.shape[0] == 60
     assert num_nodes == federated_data.shape[0] == federated_label.shape[0]
     assert (np.sort(all_data.ravel()) == np.sort(train_data[idx, ].ravel())).all()
-    assert (np.sort(all_label) == np.sort(train_label[idx])).all()
+    assert (np.sort(all_label, 0) == np.sort(train_label[idx], 0)).all()
 
 
 def test_make_data_federated_wrong_weights():
@@ -110,7 +110,7 @@ def test_make_data_federated_wrong_weights():
     #assert all_data.shape[0] == 60
     assert num_nodes == federated_data.shape[0] == federated_label.shape[0]
     assert (np.sort(all_data.ravel()) == np.sort(train_data[idx, ].ravel())).all()
-    assert (np.sort(all_label) == np.sort(train_label[idx])).all()
+    assert (np.sort(all_label, 0) == np.sort(train_label[idx], 0)).all()
 
 
 def test_get_federated_data():

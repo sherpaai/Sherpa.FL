@@ -1,5 +1,5 @@
 import numpy as np
-from unittest.mock import Mock
+from unittest.mock import Mock, patch
 import pytest
 
 
@@ -128,4 +128,30 @@ def test_linear_regression_model_set_get_params():
     lnr.set_model_params(params)
     
     assert np.array_equal(lnr.get_model_params(), params)
-    
+
+
+@patch('shfl.model.linear_regression_model.metrics.mean_squared_error')
+def test_linear_regression_model_performance(mse_mock):
+    n_features = 9
+    n_targets = 3
+    data = np.random.randint(0, 100, 10).reshape((-1, 1))
+    labels = np.random.rand(10)
+
+    lnr = LinearRegressionModel(n_features=n_features, n_targets=n_targets)
+
+    lnr.predict = Mock()
+    prediction = labels + 0.5
+    lnr.predict.return_value = prediction
+    mse_mock.return_value = 4
+
+    lnr._check_data = Mock()
+    lnr._check_labels = Mock()
+
+    rmse = lnr.performance(data, labels)
+
+    lnr._check_data.assert_called_once_with(data)
+    lnr._check_labels.assert_called_once_with(labels)
+    lnr.predict.assert_called_once_with(data)
+    mse_mock.assert_called_once_with(labels, prediction)
+
+    assert -rmse == np.sqrt(mse_mock.return_value)

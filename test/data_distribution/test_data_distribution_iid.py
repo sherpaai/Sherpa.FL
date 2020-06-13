@@ -1,4 +1,5 @@
 import numpy as np
+import tensorflow as tf
 
 from shfl.data_base.data_base import DataBase
 from shfl.data_distribution.data_distribution_iid import IidDataDistribution
@@ -11,8 +12,8 @@ class TestDataBase(DataBase):
     def load_data(self):
         self._train_data = np.random.rand(200).reshape([40, 5])
         self._test_data = np.random.rand(200).reshape([40, 5])
-        self._train_labels = np.random.randint(0, 10, 40)
-        self._test_labels = np.random.randint(0, 10, 40)
+        self._train_labels = tf.keras.utils.to_categorical(np.random.randint(0, 10, 40))
+        self._test_labels = tf.keras.utils.to_categorical(np.random.randint(0, 10, 40))
 
 
 def test_make_data_federated():
@@ -46,7 +47,7 @@ def test_make_data_federated():
     assert all_data.shape[0] == int(percent * train_data.shape[0] / 100)
     assert num_nodes == federated_data.shape[0] == federated_label.shape[0]
     assert (np.sort(all_data.ravel()) == np.sort(train_data[idx,].ravel())).all()
-    assert (np.sort(all_label) == np.sort(train_label[idx])).all()
+    assert (np.sort(all_label, 0) == np.sort(train_label[idx], 0)).all()
 
     #test make federated data with replacement
     federated_data, federated_label = data_distribution.make_data_federated(train_data,
@@ -68,7 +69,7 @@ def test_make_data_federated():
     assert all_data.shape[0] == int(percent * train_data.shape[0] / 100)
     assert num_nodes == federated_data.shape[0] == federated_label.shape[0]
     assert (np.sort(all_data.ravel()) == np.sort(train_data[idx,].ravel())).all()
-    assert (np.sort(all_label) == np.sort(train_label[idx])).all()
+    assert (np.sort(all_label, 0) == np.sort(train_label[idx], 0)).all()
 
 
 def test_make_data_federated_wrong_weights():
@@ -104,4 +105,4 @@ def test_make_data_federated_wrong_weights():
     assert all_data.shape[0] == int(percent * train_data.shape[0] / 100)
     assert num_nodes == federated_data.shape[0] == federated_label.shape[0]
     assert (np.sort(all_data.ravel()) == np.sort(train_data[idx,].ravel())).all()
-    assert (np.sort(all_label) == np.sort(train_label[idx])).all()
+    assert (np.sort(all_label, 0) == np.sort(train_label[idx], 0)).all()

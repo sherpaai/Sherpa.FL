@@ -61,6 +61,19 @@ class DeepLearningModel(TrainableModel):
 
         return self._model.evaluate(data, labels, verbose=0)
 
+    def performance(self, data, labels):
+        """
+        Implementation of abstract method of class [TrainableModel](../Model/#trainablemodel-class)
+
+        Arguments:
+            data: Data with shape NxD (N: Number of elements; D: Dimensions)
+            labels: Labels for data with One Hot Encoded format.
+        """
+        self._check_data(data)
+        self._check_labels(labels)
+
+        return self._model.evaluate(data, labels, verbose=0)[0]
+
     def get_model_params(self):
         """
         Implementation of abstract method of class [TrainableModel](../Model/#trainablemodel-class)
@@ -96,8 +109,6 @@ class DeepLearningModel(TrainableModel):
         for k, v in self.__dict__.items():
             if k == "_model":
                 model = tf.keras.models.clone_model(v)
-                # TODO: A private property is beeing accesed to copy metrics because from tensorflow 2.2 metrics are
-                #  only available after fit. Different approach should be used.
                 model.compile(optimizer=v.optimizer.__class__.__name__, loss=v.loss,
                               metrics=v.compiled_metrics._user_metrics)
 

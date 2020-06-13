@@ -246,3 +246,38 @@ def test_set_weights():
 
     kdpm._model.set_weights.assert_called_once_with(params)
 
+
+def test_performance():
+    model = Mock()
+    layer = Mock
+
+    num_data = 30
+    sizes = [(1, 24, 24), (24, num_data)]
+
+    l1 = layer()
+    l1.get_input_shape_at.return_value = sizes[0]
+    l2 = layer()
+    l2.get_output_shape_at.return_value = sizes[1]
+    model.layers = [l1, l2]
+
+    model.evaluate.return_value = [0, 0]
+
+    batch = 32
+    epoch = 2
+    kdpm = DeepLearningModel(model, batch, epoch)
+
+    kdpm._check_data = Mock()
+    kdpm._check_labels = Mock()
+
+    data = np.random.rand(25).reshape((5, 5))
+    labels = np.random.randint(0, 2, 5)
+
+    res = kdpm.performance(data, labels)
+
+    kdpm._check_data.assert_called_once_with(data)
+    kdpm._check_labels.assert_called_once_with(labels)
+
+    kdpm._model.evaluate.assert_called_once_with(data, labels, verbose=0)
+
+    assert res == 0
+

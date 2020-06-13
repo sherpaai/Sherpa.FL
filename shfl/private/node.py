@@ -176,6 +176,16 @@ class DataNode:
         """
         return self._model.evaluate(data, labels)
 
+    def performance(self, data, labels):
+        """
+        Evaluates the performance of the model in terms of the most representative metric.
+
+        # Arguments:
+            data: Data to predict
+            labels: True values of data
+        """
+        return self._model.performance(data, labels)
+
     def local_evaluate(self, data_key):
         if bool(self._private_test_data):
             labeled_data = self._private_test_data.get(data_key)

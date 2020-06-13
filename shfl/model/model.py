@@ -32,7 +32,7 @@ class TrainableModel(abc.ABC):
     @abc.abstractmethod
     def evaluate(self, data, labels):
         """
-        This method must return the performance of the prediction for those labels
+        This method must return the performance in terms of different metrics of the prediction for those labels
 
         # Arguments:
             data: Data to be evaluated
@@ -55,4 +55,15 @@ class TrainableModel(abc.ABC):
 
         # Arguments:
             params: Parameters defining the model
+        """
+
+    @abc.abstractmethod
+    def performance(self, data, labels):
+        """
+        This method must return the performance of the prediction in terms of the most representative metric
+        for those labels.
+
+        # Arguments:
+            data: Data to be evaluated
+            labels: True values of data
         """

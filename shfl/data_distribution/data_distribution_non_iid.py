@@ -1,5 +1,6 @@
 import numpy as np
 import random
+import tensorflow as tf
 
 from shfl.data_distribution.data_distribution import DataDistribution
 
@@ -58,6 +59,13 @@ class NonIidDataDistribution(DataDistribution):
         """
         if weights is None:
             weights = np.full(num_nodes, 1/num_nodes)
+
+        # Check label's format
+        if labels.ndim == 1:
+            one_hot = False
+            labels = tf.keras.utils.to_categorical(labels)
+        else:
+            one_hot = True
 
         # Shuffle data
         randomize = np.arange(len(labels))
@@ -127,5 +135,8 @@ class NonIidDataDistribution(DataDistribution):
 
             federated_data = np.array(federated_data)
             federated_label = np.array(federated_label)
+
+        if not one_hot:
+            federated_label = np.array([np.argmax(node, 1) for node in federated_label])
 
         return federated_data, federated_label

@@ -8,4 +8,7 @@ from shfl.data_base.data_base import LabeledDatabase
 from shfl.data_base.emnist import Emnist
 from shfl.data_base.fashion_mnist import FashionMnist
 from shfl.data_base.california_housing import CaliforniaHousing
+from shfl.data_base.iris import Iris
+
+
 

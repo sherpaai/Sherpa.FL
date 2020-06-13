@@ -64,6 +64,19 @@ class KMeansModel(TrainableModel):
         rai = metrics.adjusted_rand_score(labels, prediction)
         return homo, compl, v_meas, rai
 
+    def performance(self, data, labels):
+        """
+        Implementation of abstract method of class [TrainableModel](../Model/#trainablemodel-class)
+
+        Arguments:
+            data: Data, array-like of shape (n_samples, n_features)
+            labels: Target, array-like of shape (n_samples,) or (n_samples, n_targets)
+        """
+        prediction = self.predict(data)
+        v_meas = metrics.v_measure_score(labels, prediction)
+
+        return v_meas
+
     def get_model_params(self):
         """
         Implementation of abstract method of class [TrainableModel](../Model/#trainablemodel-class)

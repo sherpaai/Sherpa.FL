@@ -64,6 +64,22 @@ class LinearRegressionModel(TrainableModel):
         
         return rmse, r2
 
+    def performance(self, data, labels):
+        """
+        Implementation of abstract method of class [TrainableModel](../Model/#trainablemodel-class)
+
+        Arguments:
+            data: Data, array-like of shape (n_samples, n_features)
+            labels: Target, array-like of shape (n_samples,) or (n_samples, n_targets)
+        """
+        self._check_data(data)
+        self._check_labels(labels)
+
+        prediction = self.predict(data)
+        rmse = np.sqrt(metrics.mean_squared_error(labels, prediction))
+
+        return -rmse
+
     def get_model_params(self):
         """
         Implementation of abstract method of class [TrainableModel](../Model/#trainablemodel-class)
