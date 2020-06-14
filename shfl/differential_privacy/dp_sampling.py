@@ -1,10 +1,22 @@
 import abc
+import numpy as np
 from math import log
 from math import exp
 from scipy.special import comb
-import numpy as np
+from functools import reduce
+from operator import mul
 
 from shfl.private.data import DPDataAccessDefinition
+
+
+def prod(iterable):
+    """
+    This is a multiplicational equivalent of python sum function
+    """
+    return reduce(mul, iterable, 1)
+
+
+array_sampler = np.random.default_rng()
 
 
 class Sampler(DPDataAccessDefinition):
@@ -57,11 +69,13 @@ class SampleWithReplacement(Sampler):
     """
         It implements the sample with replacement technique (Theorem 10 from the reference) which reduces
         the epsilon-delta bugdet spent specified
-    
+
+        Note that it only can sample the first dimension of a ndarray.
+
         # Arguments:
-            sample_size: size of the sample
-            data_size: size of the input data
-        
+            sample_size: one dimentional size of the sample
+            data_size: shape of the input data
+
         # References:
             - [Privacy Amplification by Subsampling: Tight Analyses via Couplings and Divergences](https://arxiv.org/abs/1807.01647)
     """
@@ -70,22 +84,33 @@ class SampleWithReplacement(Sampler):
         super().__init__(dp_mechanism)
         check_sample_size(sample_size, data_size)
         self._dp_mechanism = dp_mechanism
-        self._sample_size = sample_size
         self._data_size = data_size
+        self._sample_size = sample_size
+        if len(self._data_size) > 1:
+            # Data with more than one dimension
+            self._actual_sample_size = self._sample_size * \
+                prod(self._data_size[1:])
+            self._data_size = prod(self._data_size)
+        else:
+            # One dimensional data
+            self._actual_sample_size = self._sample_size
+            self._data_size = self._data_size[0]
 
     def sample(self, data):
-        return np.random.choice(data, self._sample_size, replace=True)
+        return array_sampler.choice(data, size=self._sample_size, replace=True)
 
     def epsilon_delta_reduction(self, epsilon_delta):
-        proportion = 1 - (1 - 1 / self._data_size) ** self._sample_size
+        proportion = 1 - (1 - 1 / self._data_size) ** self._actual_sample_size
         epsilon, delta = epsilon_delta
 
         new_epsilon = log(1 + proportion * (exp(epsilon) - 1))
         n = self._data_size
-        m = self._sample_size
+        m = self._actual_sample_size
         new_delta = 0
         for k in range(1, m + 1):
-            new_delta += comb(m, k) * ((1 / n) ** k) * ((1 - 1 / n) ** (m - k))
+            # WARNING: comb(m, k) may overflow for realtively small m and k, such as 2500 and 500
+            new_delta += comb(m, k) * \
+                ((1 / n) ** k) * ((1 - 1 / n) ** (m - k))
         new_delta *= delta
 
         return new_epsilon, new_delta
@@ -94,12 +119,14 @@ class SampleWithReplacement(Sampler):
 class SampleWithoutReplacement(Sampler):
     """
         It implements the sample with replacement technique (Theorem 9 from the reference) which reduces
-        the epsilon-delta bugdet spent specified
-    
+        the epsilon-delta bugdet spent specified.
+
+        Note that it only can sample the first dimension of a ndarray.
+
         # Arguments:
-            sample_size: size of the sample
-            data_size: size of the input data
-        
+            sample_size: one dimentional size of the sample
+            data_size: shape of the input data
+
         # References:
             - [Privacy Amplification by Subsampling: Tight Analyses via Couplings and Divergences](https://arxiv.org/abs/1807.01647)
     """
@@ -108,14 +135,23 @@ class SampleWithoutReplacement(Sampler):
         super().__init__(dp_mechanism)
         check_sample_size(sample_size, data_size)
         self._dp_mechanism = dp_mechanism
-        self._sample_size = sample_size
         self._data_size = data_size
+        self._sample_size = sample_size
+        if len(self._data_size) > 1:
+            # Data with more than one dimension
+            self._actual_sample_size = self._sample_size * \
+                prod(self._data_size[1:])
+            self._data_size = prod(self._data_size)
+        else:
+            # One dimensional data
+            self._actual_sample_size = self._sample_size
+            self._data_size = self._data_size[0]
 
     def sample(self, data):
-        return np.random.choice(data, self._sample_size, replace=False)
+        return array_sampler.choice(data, size=self._sample_size, replace=False)
 
     def epsilon_delta_reduction(self, epsilon_delta):
-        proportion = self._sample_size / self._data_size
+        proportion = self._actual_sample_size / self._data_size
         epsilon, delta = epsilon_delta
 
         new_epsilon = log(1 + proportion * (exp(epsilon) - 1))
@@ -125,5 +161,6 @@ class SampleWithoutReplacement(Sampler):
 
 
 def check_sample_size(sample_size, data_size):
-    if sample_size > data_size:
-        raise ValueError("Sample size {} must be less than data size: {}".format(sample_size, data_size))
+    if sample_size > data_size[0]:
+        raise ValueError("Sample size {} must be less than data size: {}".format(
+            sample_size, data_size))
