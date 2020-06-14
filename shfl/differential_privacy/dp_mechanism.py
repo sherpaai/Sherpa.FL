@@ -9,8 +9,8 @@ from shfl.private.query import IdentityFunction
 
 class RandomizedResponseCoins(DPDataAccessDefinition):
     """
-    This class uses a simple mechanism to add randomness for binary data. This algorithm is described
-    by Cynthia Dwork and Aaron Roth in "The algorithmic Foundations of Differential Privacy".
+    This class uses a simple mechanism to add randomness for binary data. Both the input and output are binary
+    arrays or scalars. This algorithm is described by Cynthia Dwork and Aaron Roth in "The algorithmic Foundations of Differential Privacy".
 
     1.- Flip a coin
 
@@ -46,17 +46,14 @@ class RandomizedResponseCoins(DPDataAccessDefinition):
         """
         Implements the two coin flip algorithm described by Dwork.
         """
+        data = np.asarray(data)
         _check_binary_data(data)
-        size = _get_data_size(data)
-
-        first_coin_flip = np.random.rand(size) > self._prob_head_first
-        second_coin_flip = np.random.rand(size) < self._prob_head_second
-
+        
+        first_coin_flip  = scipy.stats.bernoulli.rvs(p=(1 - self._prob_head_first), size=data.shape)
+        second_coin_flip = scipy.stats.bernoulli.rvs(p=self._prob_head_second, size=data.shape)
+    
         result = data * first_coin_flip + \
             (1 - first_coin_flip) * second_coin_flip
-
-        if np.isscalar(data):
-            result = int(result)
 
         return result
 
@@ -112,24 +109,14 @@ class RandomizedResponseBinary(DPDataAccessDefinition):
 
         Both the input and output of the method are binary arrays.
         """
+        data = np.asarray(data)
         _check_binary_data(data)
-        size = _get_data_size(data)
-
-        if size > 1:
-            # Binary array case
-            x_response = np.zeros(size)
-            x_zero = data == 0
-            x_response[x_zero] = scipy.stats.bernoulli.rvs(
-                1 - self._f0, size=sum(x_zero))
-            x_response[~x_zero] = scipy.stats.bernoulli.rvs(
-                self._f1, size=len(data) - sum(x_zero))
-        else:
-            # Scalar case
-            if data == 0:
-                x_response = int(
-                    scipy.stats.bernoulli.rvs(1 - self._f0, size=1))
-            else:
-                x_response = int(scipy.stats.bernoulli.rvs(self._f1, size=1))
+        
+        probabilities = np.empty(data.shape)
+        x_zero = data == 0
+        probabilities[x_zero]  = 1 - self._f0
+        probabilities[~x_zero] = self._f1
+        x_response = scipy.stats.bernoulli.rvs(p=probabilities)
 
         return x_response
 
@@ -149,7 +136,7 @@ class LaplaceMechanism(DPDataAccessDefinition):
     (see: [SensitivitySampler](../sensitivity_sampler))
 
     # Arguments:
-        sensitivity: float representing sensitivity of the applied query
+        sensitivity: float or array representing sensitivity of the applied query
         epsilon: float for the epsilon you want to apply
         query: Function to apply over private data (see: [Query](../../private/query)). This parameter is optional and \
             the identity function (see: [IdentityFunction](../../private/query/#identityfunction-class)) will be used \
@@ -162,6 +149,7 @@ class LaplaceMechanism(DPDataAccessDefinition):
 
     def __init__(self, sensitivity, epsilon, query=None):
         check_epsilon_delta((epsilon, 0))
+        check_sensitivity_positive(sensitivity)
 
         if query is None:
             query = IdentityFunction()
@@ -175,11 +163,12 @@ class LaplaceMechanism(DPDataAccessDefinition):
         return self._epsilon, 0
 
     def apply(self, data):
-        query_result = self._query.get(data)
-        size = _get_data_size(query_result)
-        b = self._sensitivity / self._epsilon
+        query_result = np.asarray(self._query.get(data))
+        sensitivity = np.asarray(self._sensitivity)
+        check_sensitivity_shape(sensitivity, query_result)
+        b = sensitivity / self._epsilon
 
-        return query_result + np.random.laplace(loc=0.0, scale=b, size=size)
+        return query_result + np.random.laplace(loc=0.0, scale=b, size=query_result.shape)
 
 
 class GaussianMechanism(DPDataAccessDefinition):
@@ -199,7 +188,7 @@ class GaussianMechanism(DPDataAccessDefinition):
     (see: [SensitivitySampler](../sensitivity_sampler))
 
     # Arguments:
-        sensitivity: float representing l2-sensitivity of the applied query
+        sensitivity: float or array representing l2-sensitivity of the applied query
         epsilon: float for the epsilon you want to apply
         delta: float for the delta you want to apply
         query: Function to apply over private data (see: [Query](../../private/query)). This parameter is optional and \
@@ -216,6 +205,7 @@ class GaussianMechanism(DPDataAccessDefinition):
         if epsilon_delta[0] >= 1:
             raise ValueError(
                 "In the Gaussian mechanism epsilon have to be greater than 0 and less than 1")
+        check_sensitivity_positive(sensitivity)
         if query is None:
             query = IdentityFunction()
         self._sensitivity = sensitivity
@@ -227,12 +217,13 @@ class GaussianMechanism(DPDataAccessDefinition):
         return self._epsilon_delta
 
     def apply(self, data):
-        query_result = self._query.get(data)
-        size = _get_data_size(query_result)
-        std = sqrt(
-            2 * np.log(1.25 / self._epsilon_delta[1])) * self._sensitivity / self._epsilon_delta[0]
+        query_result = np.asarray(self._query.get(data))
+        sensitivity = np.asarray(self._sensitivity)
+        check_sensitivity_shape(sensitivity, query_result)
+        std = sqrt(2 * np.log(1.25 / self._epsilon_delta[1])) * \
+            sensitivity / self._epsilon_delta[0]
 
-        return query_result + np.random.normal(loc=0.0, scale=std, size=size)
+        return query_result + np.random.normal(loc=0.0, scale=std, size=query_result.shape)
 
 
 class ExponentialMechanism(DPDataAccessDefinition):
@@ -285,21 +276,25 @@ def check_epsilon_delta(epsilon_delta):
     if epsilon_delta[0] < 0:
         raise ValueError("Epsilon have to be greater than 0 and less than 1")
 
-
-def _get_data_size(data):
-    if np.isscalar(data):
-        size = (1,)
-    else:
-        size = data.shape
-
-    return size
-
-
+        
 def _check_binary_data(data):
-    if np.isscalar(data):
-        if data != 0 and data != 1:
-            raise ValueError(
-                "Randomized mechanism works with binary scalars, but input is not binary")
-    elif not np.array_equal(data, data.astype(bool)):
+    if not np.array_equal(data, data.astype(bool)):
         raise ValueError(
             "Randomized mechanism works with binary data, but input is not binary")
+        
+
+def check_sensitivity_positive(sensitivity):
+    sensitivity = np.asarray(sensitivity)
+    if (sensitivity < 0).any(): 
+        raise ValueError(
+            "Sensitivity of the query cannot be negative")
+        
+        
+def check_sensitivity_shape(sensitivity, query_result):
+    if sensitivity.size > 1:
+        if sensitivity.size > query_result.size:
+            raise ValueError(
+            "Provided more sensitivity values than query outputs")
+        if not all((m == n) for m, n in zip(sensitivity.shape[::-1], query_result.shape[::-1])):
+                raise ValueError("Sensitivity array dimension " + str(sensitivity.shape) + \
+                                 " cannot be broadcasted to query result dimension " + str(query_result.shape))

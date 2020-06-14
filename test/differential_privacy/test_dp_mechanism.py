@@ -381,7 +381,7 @@ def test_exponential_mechanism_obtain_laplace():
     assert np.absolute(np.mean(result) - x) < (delta_u/epsilon)     # Check the mean output is close to true value
 
 
-def test_mechanism_safery_checks():
+def test_mechanism_safety_checks():
     with pytest.raises(ValueError):
         GaussianMechanism(1, epsilon_delta=(1, 1, 1))
         
@@ -390,7 +390,7 @@ def test_mechanism_safery_checks():
         
     with pytest.raises(ValueError):
         GaussianMechanism(1, epsilon_delta=(0.5, -1))
-
+        
 
 def test_gaussian_mechanism_correctness():
     with pytest.raises(ValueError):
@@ -403,3 +403,52 @@ def test_randomized_response_correctness():
     
     with pytest.raises(ValueError):
         RandomizedResponseBinary(0.8, 0.8, epsilon=0.1)
+        
+        
+def test_sensitivity_wrong_input():
+    
+    epsilon_delta= (0.1, 1)
+    
+    # Negative sensitivity:
+    scalar = 175
+    sensitivity = -0.1
+    node = DataNode()
+    node.set_private_data("scalar", scalar)
+    with pytest.raises(ValueError):
+        node.configure_data_access("scalar", GaussianMechanism(sensitivity=sensitivity, epsilon_delta=epsilon_delta))
+
+    # Scalar query result, Too many sensitivity values provided:
+    scalar = 175
+    sensitivity = [0.1, 0.5]
+    node = DataNode()
+    node.set_private_data("scalar", scalar)
+    node.configure_data_access("scalar", GaussianMechanism(sensitivity=sensitivity, epsilon_delta=epsilon_delta))
+    with pytest.raises(ValueError):
+         result = node.query("scalar")
+            
+    # Both query result and sensitivity are 1D-arrays, but non-broadcastable:
+    data_array = [10 , 10, 10, 10]  
+    sensitivity = [0.1, 10, 100, 1000, 1000]
+    node = DataNode()
+    node.set_private_data("data_array", data_array)
+    node.configure_data_access("data_array", GaussianMechanism(sensitivity=sensitivity, epsilon_delta=epsilon_delta))
+    with pytest.raises(ValueError):
+         result = node.query("data_array")
+            
+    # ND-array query result and 1D-array sensitivity, but non-broadcastable:
+    data_ndarray = [[10 , 10, 10, 10], [10 , 10, 10, 10], [10 , 10, 10, 10]]
+    sensitivity = [0.1, 10, 100]
+    node = DataNode()
+    node.set_private_data("data_ndarray", data_ndarray)
+    node.configure_data_access("data_ndarray", GaussianMechanism(sensitivity=sensitivity, epsilon_delta=epsilon_delta))
+    with pytest.raises(ValueError):
+         result = node.query("data_ndarray")
+            
+    # Both query result and sensitivity are ND-arrays, but non-broadcastable (they should have the same shape in this case):
+    data_ndarray = [[10 , 10, 10, 10], [10 , 10, 10, 10], [10 , 10, 10, 10]]
+    sensitivity = [[0.1, 10, 100, 1000, 10000], [0.1, 10, 100, 1000, 10000], [0.1, 10, 100, 1000, 10000]]
+    node = DataNode()
+    node.set_private_data("data_ndarray", data_ndarray)
+    node.configure_data_access("data_ndarray", GaussianMechanism(sensitivity=sensitivity, epsilon_delta=epsilon_delta))
+    with pytest.raises(ValueError):
+         result = node.query("data_ndarray")
