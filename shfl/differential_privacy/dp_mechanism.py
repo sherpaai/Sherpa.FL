@@ -47,11 +47,13 @@ class RandomizedResponseCoins(DPDataAccessDefinition):
         Implements the two coin flip algorithm described by Dwork.
         """
         data = np.asarray(data)
-        _check_binary_data(data)
-        
-        first_coin_flip  = scipy.stats.bernoulli.rvs(p=(1 - self._prob_head_first), size=data.shape)
-        second_coin_flip = scipy.stats.bernoulli.rvs(p=self._prob_head_second, size=data.shape)
-    
+        check_binary_data(data)
+
+        first_coin_flip = scipy.stats.bernoulli.rvs(
+            p=(1 - self._prob_head_first), size=data.shape)
+        second_coin_flip = scipy.stats.bernoulli.rvs(
+            p=self._prob_head_second, size=data.shape)
+
         result = data * first_coin_flip + \
             (1 - first_coin_flip) * second_coin_flip
 
@@ -110,11 +112,11 @@ class RandomizedResponseBinary(DPDataAccessDefinition):
         Both the input and output of the method are binary arrays.
         """
         data = np.asarray(data)
-        _check_binary_data(data)
-        
+        check_binary_data(data)
+
         probabilities = np.empty(data.shape)
         x_zero = data == 0
-        probabilities[x_zero]  = 1 - self._f0
+        probabilities[x_zero] = 1 - self._f0
         probabilities[~x_zero] = self._f1
         x_response = scipy.stats.bernoulli.rvs(p=probabilities)
 
@@ -147,12 +149,9 @@ class LaplaceMechanism(DPDataAccessDefinition):
            https://www.cis.upenn.edu/~aaroth/Papers/privacybook.pdf)
     """
 
-    def __init__(self, sensitivity, epsilon, query=None):
+    def __init__(self, sensitivity, epsilon, query=IdentityFunction()):
         check_epsilon_delta((epsilon, 0))
         check_sensitivity_positive(sensitivity)
-
-        if query is None:
-            query = IdentityFunction()
 
         self._sensitivity = sensitivity
         self._epsilon = epsilon
@@ -200,14 +199,12 @@ class GaussianMechanism(DPDataAccessDefinition):
            https://www.cis.upenn.edu/~aaroth/Papers/privacybook.pdf)
     """
 
-    def __init__(self, sensitivity, epsilon_delta, query=None):
+    def __init__(self, sensitivity, epsilon_delta, query=IdentityFunction()):
         check_epsilon_delta(epsilon_delta)
         if epsilon_delta[0] >= 1:
             raise ValueError(
                 "In the Gaussian mechanism epsilon have to be greater than 0 and less than 1")
         check_sensitivity_positive(sensitivity)
-        if query is None:
-            query = IdentityFunction()
         self._sensitivity = sensitivity
         self._epsilon_delta = epsilon_delta
         self._query = query
@@ -276,25 +273,25 @@ def check_epsilon_delta(epsilon_delta):
     if epsilon_delta[0] < 0:
         raise ValueError("Epsilon have to be greater than 0 and less than 1")
 
-        
-def _check_binary_data(data):
+
+def check_binary_data(data):
     if not np.array_equal(data, data.astype(bool)):
         raise ValueError(
             "Randomized mechanism works with binary data, but input is not binary")
-        
+
 
 def check_sensitivity_positive(sensitivity):
     sensitivity = np.asarray(sensitivity)
-    if (sensitivity < 0).any(): 
+    if (sensitivity < 0).any():
         raise ValueError(
             "Sensitivity of the query cannot be negative")
-        
-        
+
+
 def check_sensitivity_shape(sensitivity, query_result):
     if sensitivity.size > 1:
         if sensitivity.size > query_result.size:
             raise ValueError(
-            "Provided more sensitivity values than query outputs")
+                "Provided more sensitivity values than query outputs")
         if not all((m == n) for m, n in zip(sensitivity.shape[::-1], query_result.shape[::-1])):
-                raise ValueError("Sensitivity array dimension " + str(sensitivity.shape) + \
-                                 " cannot be broadcasted to query result dimension " + str(query_result.shape))
+            raise ValueError("Sensitivity array dimension " + str(sensitivity.shape) +
+                             " cannot be broadcasted to query result dimension " + str(query_result.shape))
