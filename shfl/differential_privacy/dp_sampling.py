@@ -76,6 +76,9 @@ class SampleWithReplacement(Sampler):
             sample_size: one dimentional size of the sample
             data_size: shape of the input data
 
+        Warning: when using the method `epsilon_delta_reduction` there is
+        a great risk of float overflow for relatively small parameters (sample_size and data_size)
+
         # References:
             - [Privacy Amplification by Subsampling: Tight Analyses via Couplings and Divergences](https://arxiv.org/abs/1807.01647)
     """
