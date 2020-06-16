@@ -1,7 +1,6 @@
 from math import sqrt, log, exp
 
-from shfl.private.data import DataAccessDefinition
-from shfl.differential_privacy.dp_mechanism import check_epsilon_delta
+from shfl.private.data import DPDataAccessDefinition
 
 
 class ExceededPrivacyBudgetError(Exception):
@@ -24,7 +23,7 @@ class ExceededPrivacyBudgetError(Exception):
         return 'Error: Privacy Budget {} has been exceeded'.format(self._epsilon_delta)
 
 
-class AdaptiveDifferentialPrivacy(DataAccessDefinition):
+class AdaptiveDifferentialPrivacy(DPDataAccessDefinition):
     """
     It provides Adaptive Differential Privacy through Privacy Filters
 
@@ -35,7 +34,7 @@ class AdaptiveDifferentialPrivacy(DataAccessDefinition):
     """
 
     def __init__(self, epsilon_delta, differentially_private_mechanism=None):
-        check_epsilon_delta(epsilon_delta)
+        self._check_epsilon_delta(epsilon_delta)
 
         self._epsilon_delta = epsilon_delta
         self._epsilon_delta_access_history = []

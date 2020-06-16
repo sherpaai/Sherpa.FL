@@ -47,7 +47,7 @@ class RandomizedResponseCoins(DPDataAccessDefinition):
         Implements the two coin flip algorithm described by Dwork.
         """
         data = np.asarray(data)
-        check_binary_data(data)
+        self._check_binary_data(data)
 
         first_coin_flip = scipy.stats.bernoulli.rvs(
             p=(1 - self._prob_head_first), size=data.shape)
@@ -86,7 +86,7 @@ class RandomizedResponseBinary(DPDataAccessDefinition):
     """
 
     def __init__(self, f0, f1, epsilon):
-        check_epsilon_delta((epsilon, 0))
+        self._check_epsilon_delta((epsilon, 0))
         if f0 <= 0 or f0 >= 1:
             raise ValueError(
                 "f0 argument must be between 0 an 1, {} was provided".format(f0))
@@ -112,7 +112,7 @@ class RandomizedResponseBinary(DPDataAccessDefinition):
         Both the input and output of the method are binary arrays.
         """
         data = np.asarray(data)
-        check_binary_data(data)
+        self._check_binary_data(data)
 
         probabilities = np.empty(data.shape)
         x_zero = data == 0
@@ -150,8 +150,8 @@ class LaplaceMechanism(DPDataAccessDefinition):
     """
 
     def __init__(self, sensitivity, epsilon, query=IdentityFunction()):
-        check_epsilon_delta((epsilon, 0))
-        check_sensitivity_positive(sensitivity)
+        self._check_epsilon_delta((epsilon, 0))
+        self._check_sensitivity_positive(sensitivity)
 
         self._sensitivity = sensitivity
         self._epsilon = epsilon
@@ -164,7 +164,7 @@ class LaplaceMechanism(DPDataAccessDefinition):
     def apply(self, data):
         query_result = np.asarray(self._query.get(data))
         sensitivity = np.asarray(self._sensitivity)
-        check_sensitivity_shape(sensitivity, query_result)
+        self._check_sensitivity_shape(sensitivity, query_result)
         b = sensitivity / self._epsilon
 
         return query_result + np.random.laplace(loc=0.0, scale=b, size=query_result.shape)
@@ -177,7 +177,7 @@ class GaussianMechanism(DPDataAccessDefinition):
 
     Notice that the Gaussian mechanism is a randomization algorithm that depends on the l2-sensitivity,
     which can be regarded as a numeric query. One can show that this mechanism is
-    (epsilon, delta)-differentially private where noise is draw from a Gauss Distribution with zero mean 
+    (epsilon, delta)-differentially private where noise is draw from a Gauss Distribution with zero mean
     and standard deviation equal to sqrt(2 * ln(1,25/delta)) * l2-sensivity / epsilon where epsilon
     is in the interval (0, 1)
 
@@ -200,11 +200,11 @@ class GaussianMechanism(DPDataAccessDefinition):
     """
 
     def __init__(self, sensitivity, epsilon_delta, query=IdentityFunction()):
-        check_epsilon_delta(epsilon_delta)
+        self._check_epsilon_delta(epsilon_delta)
         if epsilon_delta[0] >= 1:
             raise ValueError(
                 "In the Gaussian mechanism epsilon have to be greater than 0 and less than 1")
-        check_sensitivity_positive(sensitivity)
+        self._check_sensitivity_positive(sensitivity)
         self._sensitivity = sensitivity
         self._epsilon_delta = epsilon_delta
         self._query = query
@@ -216,7 +216,7 @@ class GaussianMechanism(DPDataAccessDefinition):
     def apply(self, data):
         query_result = np.asarray(self._query.get(data))
         sensitivity = np.asarray(self._sensitivity)
-        check_sensitivity_shape(sensitivity, query_result)
+        self._check_sensitivity_shape(sensitivity, query_result)
         std = sqrt(2 * np.log(1.25 / self._epsilon_delta[1])) * \
             sensitivity / self._epsilon_delta[0]
 
@@ -225,7 +225,7 @@ class GaussianMechanism(DPDataAccessDefinition):
 
 class ExponentialMechanism(DPDataAccessDefinition):
     """
-    Implements the exponential mechanism differential privacy defined by Dwork in 
+    Implements the exponential mechanism differential privacy defined by Dwork in
     "The algorithmic Foundations of Differential Privacy".
 
     # Arguments:
@@ -242,7 +242,7 @@ class ExponentialMechanism(DPDataAccessDefinition):
     """
 
     def __init__(self, u, r, delta_u, epsilon, size=1):
-        check_epsilon_delta((epsilon, 0))
+        self._check_epsilon_delta((epsilon, 0))
         self._u = u
         self._r = r
         self._delta_u = delta_u
@@ -262,36 +262,3 @@ class ExponentialMechanism(DPDataAccessDefinition):
             a=r_range, size=self._size, replace=True, p=p)
 
         return sample
-
-
-def check_epsilon_delta(epsilon_delta):
-    if len(epsilon_delta) != 2:
-        raise ValueError("epsilon_delta parameter should be a tuple with two elements, but {} were given"
-                         .format(len(epsilon_delta)))
-    if epsilon_delta[1] < 0:
-        raise ValueError("Delta have to be greater than zero")
-    if epsilon_delta[0] < 0:
-        raise ValueError("Epsilon have to be greater than 0 and less than 1")
-
-
-def check_binary_data(data):
-    if not np.array_equal(data, data.astype(bool)):
-        raise ValueError(
-            "Randomized mechanism works with binary data, but input is not binary")
-
-
-def check_sensitivity_positive(sensitivity):
-    sensitivity = np.asarray(sensitivity)
-    if (sensitivity < 0).any():
-        raise ValueError(
-            "Sensitivity of the query cannot be negative")
-
-
-def check_sensitivity_shape(sensitivity, query_result):
-    if sensitivity.size > 1:
-        if sensitivity.size > query_result.size:
-            raise ValueError(
-                "Provided more sensitivity values than query outputs")
-        if not all((m == n) for m, n in zip(sensitivity.shape[::-1], query_result.shape[::-1])):
-            raise ValueError("Sensitivity array dimension " + str(sensitivity.shape) +
-                             " cannot be broadcasted to query result dimension " + str(query_result.shape))
