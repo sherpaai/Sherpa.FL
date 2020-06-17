@@ -15,6 +15,3 @@ from shfl.differential_privacy.probability_distribution import ProbabilityDistri
 from shfl.differential_privacy.probability_distribution import NormalDistribution
 from shfl.differential_privacy.probability_distribution import GaussianMixture
 from shfl.differential_privacy.dp_sampling import SampleWithoutReplacement
-from shfl.differential_privacy.dp_sampling import SampleWithReplacement
-
-
