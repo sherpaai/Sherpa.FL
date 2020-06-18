@@ -8,6 +8,9 @@ class DeepLearningModel(TrainableModel):
     """
     This class offers support for Keras and tensorflow models. It implements [TrainableModel](../Model/#trainablemodel-class)
 
+    # Attributes:
+        * **_model, _data_shape, _labels_shape, _batch_size, _epochs**
+
     # Arguments:
         model: Compiled model, ready to train
         batch_size: batch_size to apply
@@ -41,8 +44,11 @@ class DeepLearningModel(TrainableModel):
         """
         Implementation of abstract method of class [TrainableModel](../Model/#trainablemodel-class)
 
-        Arguments:
+        # Arguments:
             data: Data with shape NxD (N: Number of elements; D: Dimensions)
+
+        # Returns:
+            predictions: Predictions for data argument
         """
         self._check_data(data)
 
@@ -52,9 +58,12 @@ class DeepLearningModel(TrainableModel):
         """
         Implementation of abstract method of class [TrainableModel](../Model/#trainablemodel-class)
 
-        Arguments:
+        # Arguments:
             data: Data with shape NxD (N: Number of elements; D: Dimensions)
             labels: Labels for data with One Hot Encoded format.
+
+        # Returns:
+            metrics: Returns metrics for data argument
         """
         self._check_data(data)
         self._check_labels(labels)
@@ -65,9 +74,12 @@ class DeepLearningModel(TrainableModel):
         """
         Implementation of abstract method of class [TrainableModel](../Model/#trainablemodel-class)
 
-        Arguments:
+        # Arguments:
             data: Data with shape NxD (N: Number of elements; D: Dimensions)
             labels: Labels for data with One Hot Encoded format.
+
+        # Returns:
+            metric: Returns the value of the main metric.
         """
         self._check_data(data)
         self._check_labels(labels)
@@ -77,12 +89,18 @@ class DeepLearningModel(TrainableModel):
     def get_model_params(self):
         """
         Implementation of abstract method of class [TrainableModel](../Model/#trainablemodel-class)
+
+        # Returns
+            weights: Returns the model weights.
         """
         return self._model.get_weights()
 
     def set_model_params(self, params):
         """
         Implementation of abstract method of class [TrainableModel](../Model/#trainablemodel-class)
+
+        # Arguments:
+            params: array with the model weights
         """
         self._model.set_weights(params)
 
@@ -103,6 +121,9 @@ class DeepLearningModel(TrainableModel):
                                  + " .Current data has shape " + str(labels.shape[1:]))
 
     def __deepcopy__(self, memo):
+        """
+        Overwrite deepcopy method
+        """
         cls = self.__class__
         result = cls.__new__(cls)
         memo[id(self)] = result

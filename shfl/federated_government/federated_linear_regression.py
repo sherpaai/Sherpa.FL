@@ -19,6 +19,9 @@ class FederatedLinearRegression(FederatedGovernment):
     Class used to represent a high-level federated linear regression
     (see: [FederatedGoverment](../federated_goverment/#federatedgoverment-class)).
 
+    # Attributes:
+        * **_num_features, _test_data, _test_labels**
+
     # Arguments:
         data_base_name_key: key of the enumeration of valid data bases (see: [ClusteringDataBases](./#clusteringdatabases-class))
         iid: boolean which specifies if the distribution if IID (True) or non-IID (False) (True by default)
@@ -69,5 +72,12 @@ class FederatedLinearRegression(FederatedGovernment):
             print("Federated images classifier is not properly initialised")
 
     def model_builder(self):
+        """
+        Create a Linear Regression Model.
+
+        # Returns:
+            model: Linear Regression Model /
+            [DeepLearningModel](../../model/linear_regression_model/#linearregressionmodel-class)).
+        """
         model = LinearRegressionModel(n_features=self._num_features)
         return model

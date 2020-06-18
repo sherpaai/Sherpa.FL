@@ -7,6 +7,9 @@ class IowaFederatedGovernment(FederatedGovernment):
     """
     Class used to represent the IOWA Federated Government which implements [FederatedGovernment](./federated_government/#federatedgovernment-class)
 
+    # Attributes:
+        * **_a, _b, _c, _y_b, _k, _dynamic**
+
     # Arguments:
         model_builder: Function that return a trainable model (see: [Model](../../model))
         federated_data: Federated data to use. (see: [FederatedData](../../private/federated_operation/#federateddata-class))
@@ -38,6 +41,9 @@ class IowaFederatedGovernment(FederatedGovernment):
         # Arguments:
             val_data: validation dataset
             val_label: corresponding labels to validation dataset
+
+        # Returns:
+            client_performance: Performance for each client.
         """
         client_performance = []
         for data_node in self._federated_data:

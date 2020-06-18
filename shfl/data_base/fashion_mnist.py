@@ -16,7 +16,7 @@ class FashionMnist(DataBase):
 
     def load_data(self):
         """
-        Load data from emnist package
+        Load data from fashion emnist package
 
         # Returns:
             all_data : train data, train label, test data and test labels

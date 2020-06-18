@@ -9,6 +9,12 @@ class Iris(db.DataBase):
     from sklearn, mainly for clustering tasks.
     """
     def load_data(self):
+        """
+        Load data from iris package
+
+        # Returns
+            all_data : train data, train labels, test data and test labels
+        """
         all_data = sklearn.datasets.load_iris()
         data = all_data["data"]
         labels = all_data["target"]

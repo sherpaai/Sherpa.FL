@@ -15,6 +15,9 @@ import tensorflow as tf
 
 
 class Reshape(FederatedTransformation):
+    """
+    Federated transformation to reshape the data
+    """
     def apply(self, labeled_data):
         labeled_data.data = np.reshape(labeled_data.data,
                                        (labeled_data.data.shape[0], labeled_data.data.shape[1],
@@ -33,6 +36,9 @@ class FederatedImagesClassifier(FederatedGovernment):
     """
     Class used to represent a high-level federated image classification
     (see: [FederatedGoverment](../federated_goverment/#federatedgoverment-class)).
+
+    # Attributes:
+        * **_test_data, _test_labels**
 
     # Arguments:
         data_base_name_key: key of the enumeration of valid data bases (see: [ImagesDataBases](./#imagesdatabases-class))
@@ -92,6 +98,13 @@ class FederatedImagesClassifier(FederatedGovernment):
 
     @staticmethod
     def model_builder():
+        """
+        Create a Tensorflow Model for image classification.
+
+        # Returns:
+            model: Instance of DeepLearningModel /
+            [DeepLearningModel](../../model/deep_learning_model/#deeplearningmodel-class)).
+        """
         model = tf.keras.models.Sequential()
         model.add(tf.keras.layers.Conv2D(32, kernel_size=(3, 3), padding='same', activation='relu', strides=1,
                                          input_shape=(28, 28, 1)))

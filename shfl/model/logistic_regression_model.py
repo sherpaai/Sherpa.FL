@@ -8,6 +8,9 @@ class LogisticRegressionModel(TrainableModel):
     """
     This class offers support for scikit-learn logistic regression model. It implements [TrainableModel](../Model/#trainablemodel-class)
 
+    # Attributes:
+        * **_model, _n_features**
+
     # Arguments:
         n_features: integer number of features (independent variables).
         classes: array of classes to predict. At least 2 classes must be provided.
@@ -43,8 +46,11 @@ class LogisticRegressionModel(TrainableModel):
         """
         Implementation of abstract method of class [TrainableModel](../Model/#trainablemodel-class)
 
-        Arguments:
+        # Arguments:
             data: Data, array-like of shape (n_samples, n_features)
+
+        # Returns:
+            prediction: array with predictions fro data argument.
         """
         self._check_data(data)
         
@@ -57,9 +63,15 @@ class LogisticRegressionModel(TrainableModel):
         Implementation of abstract method of class [TrainableModel](../Model/#trainablemodel-class)
         Metrics for evaluating model's performance.
         
-        Arguments:
+        # Arguments:
             data: Data, array-like of shape (n_samples, n_features)
-            labels: Target classes, array-like of shape (n_samples,) 
+            labels: Target classes, array-like of shape (n_samples,)
+
+        # Returns:
+            bas: balanced accuracy score [Balanced Accuracy](
+            https://scikit-learn.org/stable/modules/generated/sklearn.metrics.balanced_accuracy_score.html)
+            cks: cohen kappa score [Cohen's Kappa](
+            https://scikit-learn.org/stable/modules/generated/sklearn.metrics.cohen_kappa_score.html)
         """
         self._check_data(data)
         self._check_labels(labels)
@@ -74,9 +86,13 @@ class LogisticRegressionModel(TrainableModel):
         """
         Implementation of abstract method of class [TrainableModel](../Model/#trainablemodel-class)
         
-        Arguments:
+        # Arguments:
             data: Data, array-like of shape (n_samples, n_features)
-            labels: Target classes, array-like of shape (n_samples,) 
+            labels: Target classes, array-like of shape (n_samples,)
+
+        # Returns:
+            bas: balanced accuracy score [Balanced Accuracy](
+            https://scikit-learn.org/stable/modules/generated/sklearn.metrics.balanced_accuracy_score.html)
         """
         self._check_data(data)
         self._check_labels(labels)
@@ -89,6 +105,9 @@ class LogisticRegressionModel(TrainableModel):
     def get_model_params(self):
         """
         Implementation of abstract method of class [TrainableModel](../Model/#trainablemodel-class)
+
+        # Returns:
+            params: array with intercept and coef param from model
         """
         
         return np.column_stack((self._model.intercept_, self._model.coef_))
@@ -96,6 +115,9 @@ class LogisticRegressionModel(TrainableModel):
     def set_model_params(self, params):
         """
         Implementation of abstract method of class [TrainableModel](../Model/#trainablemodel-class)
+
+        # Arguments:
+            params: array Dx2 with intercept and coef values.
         """
         self._model.intercept_ = params[:, 0]
         self._model.coef_ = params[:, 1:]
@@ -103,6 +125,9 @@ class LogisticRegressionModel(TrainableModel):
     def _check_data(self, data):
         """
         Method that checks whether the data dimension is correct.
+
+        # Arguments:
+            data: array with data to check
         """
         if data.ndim == 1:
             if self._n_features != 1:
@@ -115,6 +140,9 @@ class LogisticRegressionModel(TrainableModel):
     def _check_labels(self, labels):
         """
         Method that checks whether the classes are correct.
+
+        # Arguments:
+            labels: array with labels to check
         """
         classes = np.unique(np.asarray(labels))
         if not np.array_equal(self._model.classes_, classes):

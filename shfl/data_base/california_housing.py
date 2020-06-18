@@ -9,6 +9,13 @@ class CaliforniaHousing(db.DataBase):
     from sklearn, mainly for regression tasks.
     """
     def load_data(self):
+        """
+        Load data from california housing package
+
+        # Returns
+            all_data : train data, train labels, test data and test labels
+        """
+
         all_data = sklearn.datasets.fetch_california_housing()
         data = all_data["data"]
         labels = all_data["target"]

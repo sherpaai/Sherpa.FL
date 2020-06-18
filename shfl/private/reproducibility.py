@@ -15,15 +15,11 @@ class Reproducibility:
     Is important to know that the reproducibility only works if you execute the experiment in CPU. Many ops in GPU
     like convolutions are not deterministic and the don't replicate.
 
-    # Methods:
-        get_instance():
-            Return the singleton instance
-        set_seed():
-            The clients call this method for set a seed. They have to know their own ID's
-
     # Attributes:
-        seed: Seed for the execution
-        __instance: Singleton instance
+        * **__seed, __seeds, __instance**
+
+    # Arguments:
+        seed: the main seed for server
 
     # Properties:
         seed:
@@ -38,8 +34,8 @@ class Reproducibility:
         """
         Static access method.
 
-        Return:
-            Singleton instance class
+        # Returns:
+            instance: Singleton instance class
         """
         if Reproducibility.__instance is None:
             Reproducibility()
@@ -63,7 +59,7 @@ class Reproducibility:
         """
         Set server and clients seed
 
-        Attributes:
+        # Arguments:
             id: 'server' in server node and ID in client node
         """
         if id not in self.__seeds.keys():
@@ -81,6 +77,9 @@ class Reproducibility:
         return self.__seeds
 
     def delete_instance(self):
+        """
+        Remove the singleton instance. Not recommended for normal use. This method is necessary for tests.
+        """
         if Reproducibility.__instance is not None:
             del self.__seed
             del self.__seeds

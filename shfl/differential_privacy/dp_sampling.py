@@ -23,6 +23,9 @@ class Sampler(DPDataAccessDefinition):
     This class implements sampling methods which helps to reduce
     the epsilon-delta budget spent by a dp-mechanism
 
+    # Attributes:
+        * **_dp_mechanism**
+
     # Arguments:
         sample_size: size of the sample to be taken
     """
@@ -70,6 +73,9 @@ class SampleWithoutReplacement(Sampler):
         the epsilon-delta bugdet spent specified.
 
         Note that it only can sample the first dimension of a ndarray.
+
+        # Attributes:
+            * **_dp_mechanism, _data_size, _sample_size, _actual_sample_size**
 
         # Arguments:
             sample_size: one dimentional size of the sample

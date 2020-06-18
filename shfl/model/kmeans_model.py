@@ -8,6 +8,9 @@ class KMeansModel(TrainableModel):
     """
     This class offers support for scikit-learn K-Means model. It implements [TrainableModel](../Model/#trainablemodel-class)
 
+    # Attributes:
+        * **_k_means, _init, _n_features, _n_init**
+
     # Arguments:
         n_clusters: number of clusters.
         init: Method of initialization. {‘k-means++’, ‘random’, ndarray}, default=’k-means++’.
@@ -41,8 +44,11 @@ class KMeansModel(TrainableModel):
         """
         Implementation of abstract method of class [TrainableModel](../Model/#trainablemodel-class)
 
-        Arguments:
+        # Arguments:
             data: Data, array-like of shape (n_samples, n_features)
+
+        # Returns:
+            predicted_labels: array with prediction labels for data argument.
         """
         predicted_labels = self._k_means.predict(data)
         return predicted_labels
@@ -52,9 +58,19 @@ class KMeansModel(TrainableModel):
         Implementation of abstract method of class [TrainableModel](../Model/#trainablemodel-class)
         Metrics for evaluating model's performance.
 
-        Arguments:
+        # Arguments:
             data: Data, array-like of shape (n_samples, n_features)
             labels: Target, array-like of shape (n_samples,) or (n_samples, n_targets)
+
+        # Returns:
+            homo: Homogeneity score (see [Homogeneity metric] /
+            (https://scikit-learn.org/stable/modules/generated/sklearn.metrics.homogeneity_score.html))
+            compl: Completeness score (see [Completeness metric] /
+            (https://scikit-learn.org/stable/modules/generated/sklearn.metrics.completeness_score.html))
+            v_means: v-measure score (see [V-measure cluster] /
+            (https://scikit-learn.org/stable/modules/generated/sklearn.metrics.v_measure_score.html))
+            rai: Adjusted rand score (see [Rand index adjusted metric] /
+            (https://scikit-learn.org/stable/modules/generated/sklearn.metrics.adjusted_rand_score.html))
         """
         prediction = self.predict(data)
 
@@ -68,9 +84,13 @@ class KMeansModel(TrainableModel):
         """
         Implementation of abstract method of class [TrainableModel](../Model/#trainablemodel-class)
 
-        Arguments:
+        # Arguments:
             data: Data, array-like of shape (n_samples, n_features)
             labels: Target, array-like of shape (n_samples,) or (n_samples, n_targets)
+
+        # Returns:
+            v_means: v-measure score (see [V-measure cluster] /
+            (https://scikit-learn.org/stable/modules/generated/sklearn.metrics.v_measure_score.html))
         """
         prediction = self.predict(data)
         v_meas = metrics.v_measure_score(labels, prediction)
@@ -80,6 +100,9 @@ class KMeansModel(TrainableModel):
     def get_model_params(self):
         """
         Implementation of abstract method of class [TrainableModel](../Model/#trainablemodel-class)
+
+        # Returns:
+            centers: array with cluster centers kmeans model.
         """
         return self._k_means.cluster_centers_
 

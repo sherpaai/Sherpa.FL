@@ -6,6 +6,9 @@ class LabeledData:
     """
     Class to represent labeled data
 
+    # Attributes:
+        * **_data, _label**
+
     # Arguments:
         data: Features representing a data sample
         label: Label for this sample

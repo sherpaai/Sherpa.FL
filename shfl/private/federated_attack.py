@@ -43,8 +43,14 @@ class FederatedPoisoningDataAttack(FederatedDataAttack):
 
     This class implements interface [FederatedDataAttack](./#federateddataattack-class).
 
+    # Attributes:
+        * **_percentage, _adversaries**
+
     # Arguments:
         percentage: percentage of nodes that are adversarial ones
+
+    # Properties:
+        adversaries: Returns adversaries value
     """
 
     def __init__(self, percentage):
@@ -59,6 +65,9 @@ class FederatedPoisoningDataAttack(FederatedDataAttack):
     def apply_attack(self, federated_data):
         """
         Method that implements federated attack of data poisoning shuffling training labels of some nodes.
+
+        # Arguments:
+            federated_data: Instance of Federated Data [Federated Data](../federated_operation#federateddata-class)
         """
         num_nodes = federated_data.num_nodes()
         list_nodes = np.arange(num_nodes)

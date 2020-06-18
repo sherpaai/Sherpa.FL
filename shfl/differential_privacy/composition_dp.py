@@ -8,6 +8,9 @@ class ExceededPrivacyBudgetError(Exception):
     This Exception is expected to be used when a certain privacy budget is exceed.
     When it is used, it means that the data cannot be accessed anymore
 
+    # Attributes:
+        epsilon_delta: the privacy budget which has been surpassed
+
     # Arguments:
         message: this text is shown in addition to the exception text
         epsilon_delta: the privacy budget which has been surpassed
@@ -27,10 +30,17 @@ class AdaptiveDifferentialPrivacy(DPDataAccessDefinition):
     """
     It provides Adaptive Differential Privacy through Privacy Filters
 
+    # Attributes:
+        * **_epsilon_delta, _epsilon_delta_access_history, _private_data_epsilon_delta_access_history,
+        _differentially_private_mechanism**
+
     # Arguments:
         epsilon_delta: Tuple or array of length 2 which contains the epsilon-delta privacy budget for this data
         differentially_private_mechanism: Optional. Default method that will be used to access data. If it is not set \
         it's mandatory to pass it in every query.
+
+    # Properties:
+        epsilon_delta: Return epsilon_delta value
     """
 
     def __init__(self, epsilon_delta, differentially_private_mechanism=None):

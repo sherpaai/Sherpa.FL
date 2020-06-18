@@ -39,11 +39,10 @@ class DataBase(abc.ABC):
     Load method should save data in the protected Attributes:
 
     # Attributes:
-        * **_train_data, _train_labels, _validation_data, _validation_labels, _test_data, _test_labels**
+        * **_train_data, _train_labels, _test_data, _test_labels**
 
     # Properties:
         train: Returns train data and labels
-        validation: Returns validation data and labels
         test: Returns test data and labels
         data: Returns train data, train labels, validation data, validation labels, test data and test labels
     """
@@ -103,6 +102,12 @@ class LabeledDatabase(DataBase):
         self._train_percentage = train_percentage
 
     def load_data(self):
+        """
+        Load data
+
+        # Returns
+            all_data : train data, train labels, test data and test labels
+        """
         test_size = round(len(self._data) * (1 - self._train_percentage))
         self._train_data, self._train_labels, \
             self._test_data, self._test_labels = split_train_test(self._data, self._labels, test_size)

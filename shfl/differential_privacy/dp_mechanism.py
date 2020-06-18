@@ -22,11 +22,17 @@ class RandomizedResponseCoins(DPDataAccessDefinition):
 
     This method is log(3)-differentially private
 
+    # Attributes:
+        * ** _prob_head_first, _prob_head_second, _epsilon_delta**
+
     # Arguments
         prob_head_first: float in [0,1] representing probability to use a random response instead of true value.
             This is equivalent to prob_head of the first coin flip algorithm described by Dwork.
         prob_head_second: float in [0,1] representing probability of respond true when random answer is provided.
             Equivalent to prob_head in the second coin flip in the algorithm.
+
+    # Properties:
+        epsilon_delta: Return epsilon_delta value
 
     # References
         - [The algorithmic foundations of differential privacy](
@@ -77,9 +83,15 @@ class RandomizedResponseBinary(DPDataAccessDefinition):
 
     Input data must be binary, otherwise exception will be raised.
 
+    # Attributes
+        * **_f0, _f1, _epsilon**
+
     # Arguments
         f0: float in [0,1] representing the probability of getting 0 when the input is 0
         f1: float in [0,1] representing the probability of getting 1 when the input is 1
+
+    # Properties:
+        epsilon_delta: Return epsilon_delta value
 
     # References
         - [Using Randomized Response for Differential PrivacyPreserving Data Collection](http://csce.uark.edu/~xintaowu/publ/DPL-2014-003.pdf)
@@ -137,12 +149,18 @@ class LaplaceMechanism(DPDataAccessDefinition):
     a method to estimate the sensitivity of a query that maps the private data in a normed space
     (see: [SensitivitySampler](../sensitivity_sampler))
 
+    Attributes:
+        * **_sensitivity, _epsilon, _query**
+
     # Arguments:
         sensitivity: float or array representing sensitivity of the applied query
         epsilon: float for the epsilon you want to apply
         query: Function to apply over private data (see: [Query](../../private/query)). This parameter is optional and \
             the identity function (see: [IdentityFunction](../../private/query/#identityfunction-class)) will be used \
             if it is not provided.
+
+    # Properties:
+        epsilon_delta: Return epsilon_delta value
 
     # References
         - [The algorithmic foundations of differential privacy](
@@ -186,6 +204,9 @@ class GaussianMechanism(DPDataAccessDefinition):
     a method to estimate the sensitivity of a query that maps the private data in a normed space
     (see: [SensitivitySampler](../sensitivity_sampler))
 
+    # Attributes:
+        * **_sensitivity, _epsilon_delta, _query**
+
     # Arguments:
         sensitivity: float or array representing l2-sensitivity of the applied query
         epsilon: float for the epsilon you want to apply
@@ -193,6 +214,9 @@ class GaussianMechanism(DPDataAccessDefinition):
         query: Function to apply over private data (see: [Query](../../private/query)). This parameter is optional and \
             the identity function (see: [IdentityFunction](../../private/query/#identityfunction-class)) will be used \
             if it is not provided.
+
+    # Properties:
+        epsilon_delta: Return epsilon_delta value
 
     # References
         - [The algorithmic foundations of differential privacy](
@@ -227,6 +251,9 @@ class ExponentialMechanism(DPDataAccessDefinition):
     """
     Implements the exponential mechanism differential privacy defined by Dwork in
     "The algorithmic Foundations of Differential Privacy".
+
+    # Attributes:
+        * **_u, _r, _delta_u, , _epsilon, _size**
 
     # Arguments:
         u: utility function with arguments x and r. It should be vectorized, so that for a \

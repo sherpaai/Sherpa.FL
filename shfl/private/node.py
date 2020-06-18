@@ -15,6 +15,9 @@ class DataNode:
     A model (see: [Model](../../model)) can be deployed in the DataNode and use private data
     in order to learn. It is assumed that a model is represented by its parameters and the access to these parameters
     must be also configured before queries.
+
+    # Attributes:
+        * **_private_data, _private_test_data, _private_data_access_policies, _model, _model_access_policy**
     """
 
     def __init__(self):
@@ -163,6 +166,9 @@ class DataNode:
 
         # Arguments:
             data: Data to predict
+
+        # Returns:
+            predictions: array with predictions for data argument.
         """
         return self._model.predict(data)
 
@@ -173,6 +179,9 @@ class DataNode:
         # Arguments:
             data: Data to predict
             labels: True values of data
+
+        # Returns:
+            metrics: array with metrics values for predictions for data argument.
         """
         return self._model.evaluate(data, labels)
 
@@ -183,6 +192,9 @@ class DataNode:
         # Arguments:
             data: Data to predict
             labels: True values of data
+
+        # Returns:
+            metric: return the main metric value
         """
         return self._model.performance(data, labels)
 
