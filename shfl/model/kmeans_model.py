@@ -109,6 +109,9 @@ class KMeansModel(TrainableModel):
     def set_model_params(self, params):
         """
         Implementation of abstract method of class [TrainableModel](../Model/#trainablemodel-class)
+
+        # Arguments:
+            params: representation of model params to assign
         """
         if np.array_equal(params, np.zeros((params.shape[0], params.shape[1]))):
             self.__init__(n_clusters=params.shape[0], n_features=self._n_features, init=self._init,
