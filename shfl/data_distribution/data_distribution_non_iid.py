@@ -9,6 +9,11 @@ class NonIidDataDistribution(DataDistribution):
     """
     Implementation of a non-independent and identically distributed data distribution using \
         [Data Distribution](../Data Distribution)
+
+    In this data distribution we simulate the scenario in which clients have non-identical distribution since
+    they know partially the total classes of the problem.
+
+    This distribution only works with classification problems.
     """
 
     @staticmethod

@@ -112,6 +112,9 @@ class LinearRegressionModel(TrainableModel):
     def set_model_params(self, params):
         """
         Implementation of abstract method of class [TrainableModel](../Model/#trainablemodel-class)
+
+        # Arguments:
+            params: representation of model params to assign
         """
         if self._n_targets == 1:
             self._model.intercept_ = params[0][0]               

@@ -199,6 +199,12 @@ class DataNode:
         return self._model.performance(data, labels)
 
     def local_evaluate(self, data_key):
+        """
+        Evaluation of local models on local data test
+
+        # Arguments:
+            data_key: key of the private data of the client
+        """
         if bool(self._private_test_data):
             labeled_data = self._private_test_data.get(data_key)
             return self._model.evaluate(labeled_data.data, labeled_data.label)
