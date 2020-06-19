@@ -26,7 +26,7 @@ class DataNode:
         self._private_data_access_policies = {}
         self._model = None
         self._model_access_policy = UnprotectedAccess()
-    
+
     @property
     def model(self):
         print("You can't get the model, you need to query the params to access")
@@ -48,7 +48,7 @@ class DataNode:
         """
         Allows to see data for this node, but you cannot retrieve data
 
-        # Returns
+        # Returns:
             private : data
         """
         print("Node private data, you can see the data for debug purposes but the data remains in the node")
@@ -60,7 +60,7 @@ class DataNode:
         """
         Allows to see data for this node, but you cannot retrieve data
 
-        # Returns
+        # Returns:
             private : test data
         """
         print("Node private test data, you can see the data for debug purposes but the data remains in the node")

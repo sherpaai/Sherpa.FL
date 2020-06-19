@@ -47,7 +47,7 @@ class DataAccessDefinition(abc.ABC):
         # Arguments:
             data: Raw data that are going to be accessed
 
-        # Returns
+        # Returns:
             result_data: Result data, function of argument data
         """
 
@@ -132,7 +132,7 @@ class DPDataAccessDefinition(DataAccessDefinition):
         """
         Every differentially private mechanism needs to implement this property
 
-        # Returns
+        # Returns:
             epsilon_delta: Privacy budget spent each time this differentially private mechanism is used
 
         """

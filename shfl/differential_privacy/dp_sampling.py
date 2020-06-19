@@ -34,6 +34,15 @@ class Sampler(DPDataAccessDefinition):
         self._dp_mechanism = dp_mechanism
 
     def apply(self, data):
+        """
+        This method applies a dp-mechanism to a sample of the given data.
+
+        # Arguments:
+            data: input data to be accessed.
+
+        # Returns:
+            A sample of the data accessed with a dp-mechanism.
+        """
         sampled_data = self.sample(data)
         return self._dp_mechanism.apply(sampled_data)
 
@@ -50,7 +59,7 @@ class Sampler(DPDataAccessDefinition):
         # Arguments:
             epsilon_delta: privacy budget provided by a dp-mechanism
 
-        # Returns
+        # Returns:
             new_epsilon_delta: new hopefully reduced epsilon_delta
         """
 
@@ -62,7 +71,7 @@ class Sampler(DPDataAccessDefinition):
         # Arguments:
             data: Raw data that are going to be sampled
 
-        # Returns
+        # Returns:
             sampled_data: sample of size self._sample_size
         """
 
@@ -102,9 +111,28 @@ class SampleWithoutReplacement(Sampler):
             self._data_size = self._data_size[0]
 
     def sample(self, data):
+        """
+        It receives some data and returns a sample of it, using a sample without replacement
+
+        # Arguments:
+            data: Raw data that is going to be sampled
+
+        # Returns:
+            sample of size self._sample_size
+        """
         return array_sampler.choice(data, size=self._sample_size, replace=False)
 
     def epsilon_delta_reduction(self, epsilon_delta):
+        """
+        It receives epsilon_delta parameters from a dp-mechanism
+        and computes the new hopefully reduced epsilon_delta
+
+        # Arguments:
+            epsilon_delta: privacy budget provided by a dp-mechanism
+
+        # Returns:
+            new_epsilon_delta: new hopefully reduced epsilon_delta
+        """
         proportion = self._actual_sample_size / self._data_size
         epsilon, delta = epsilon_delta
 
@@ -115,6 +143,14 @@ class SampleWithoutReplacement(Sampler):
 
 
 def check_sample_size(sample_size, data_size):
+    """
+    This method ensures that the sample simple is smaller than the
+    first dimension of the data_size
+
+    # Arguments:
+        sample_size: one dimentional size of the sample
+        data_size: shape of the given data, a tuple is expected
+    """
     if sample_size > data_size[0]:
         raise ValueError("Sample size {} must be less than data size: {}".format(
             sample_size, data_size))

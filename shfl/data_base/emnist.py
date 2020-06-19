@@ -13,12 +13,12 @@ class Emnist(db.DataBase):
     """
     def __init__(self):
         super(Emnist, self).__init__()
-       
+
     def load_data(self):
         """
         Load data from emnist package
 
-        # Returns
+        # Returns:
             all_data : train data, train labels, test data and test labels
         """
         self._train_data, self._train_labels = emnist.extract_training_samples('digits')
@@ -27,5 +27,5 @@ class Emnist(db.DataBase):
         self._test_labels = np.eye(10)[self._test_labels]
 
         self.shuffle()
-        
+
         return self.data

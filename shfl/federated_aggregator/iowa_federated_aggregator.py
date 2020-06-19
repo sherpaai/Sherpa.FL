@@ -48,7 +48,7 @@ class IowaFederatedAggregator(WeightedFedAvgAggregator):
         # Arguments:
             x: value of the ordering function u (orderer performance of each local model)
 
-        # Returns
+        # Returns:
             ponderation_weights: ponderation of each client.
         """
         if x <= self._a:
@@ -64,7 +64,7 @@ class IowaFederatedAggregator(WeightedFedAvgAggregator):
         """
         Method that returns the value of the linguistic quantifier (Q_function) for each value x
 
-        # Returns
+        # Returns:
             ponderation_weights: ponderation of each client.
         """
 

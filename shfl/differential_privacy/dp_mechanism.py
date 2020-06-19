@@ -50,7 +50,14 @@ class RandomizedResponseCoins(DPDataAccessDefinition):
 
     def apply(self, data):
         """
-        Implements the two coin flip algorithm described by Dwork.
+        This method applies the the two coin flip algorithm described by Dwork to the given data,
+        to access the data. Both the input and output of the method are binary arrays.
+
+        # Arguments:
+            data: data to be accessed. It can be either a scalar or a numpy array made of scalars.
+
+        # Returns:
+            Queried data with differential privacy.
         """
         data = np.asarray(data)
         self._check_binary_data(data)
@@ -119,9 +126,14 @@ class RandomizedResponseBinary(DPDataAccessDefinition):
 
     def apply(self, data):
         """
-        Implements the general binary randomized response algorithm.
-
+        This method applies the randomized response mechanism to the given data, to access the data
         Both the input and output of the method are binary arrays.
+
+        # Arguments:
+            data: data to be accessed. It can be either a scalar or a numpy array made of scalars.
+
+        # Returns:
+            Queried data with differential privacy.
         """
         data = np.asarray(data)
         self._check_binary_data(data)
@@ -180,6 +192,15 @@ class LaplaceMechanism(DPDataAccessDefinition):
         return self._epsilon, 0
 
     def apply(self, data):
+        """
+        This method applies the laplace mechanism to the given data, to access the data
+
+        # Arguments:
+            data: data to be accessed. It can be either a scalar or a numpy array made of scalars.
+
+        # Returns:
+            Queried data with differential privacy.
+        """
         query_result = np.asarray(self._query.get(data))
         sensitivity = np.asarray(self._sensitivity)
         self._check_sensitivity_shape(sensitivity, query_result)
@@ -238,6 +259,15 @@ class GaussianMechanism(DPDataAccessDefinition):
         return self._epsilon_delta
 
     def apply(self, data):
+        """
+        This method applies the gaussian mechanism to the given data, to access the data.
+
+        # Arguments:
+            data: data to be accessed. It can be either a scalar or a numpy array made of scalars
+
+        # Returns:
+            Queried data with differential privacy.
+        """
         query_result = np.asarray(self._query.get(data))
         sensitivity = np.asarray(self._sensitivity)
         self._check_sensitivity_shape(sensitivity, query_result)
@@ -281,6 +311,15 @@ class ExponentialMechanism(DPDataAccessDefinition):
         return self._epsilon, 0
 
     def apply(self, data):
+        """
+        This method applies the exponetial mechanism to the given data, to access the data.
+
+        # Arguments:
+            data: data to be accessed. It can be either a scalar or a numpy array made of scalars
+
+        # Returns:
+            Queried data with differential privacy.
+        """
         r_range = self._r
         u_points = self._u(data, r_range)
         p = np.exp(self._epsilon * u_points / (2 * self._delta_u))

@@ -25,7 +25,7 @@ class NonIidDataDistribution(DataDistribution):
             num_nodes: Number of nodes
             total_labels: Number of labels
 
-        # Returns
+        # Returns:
             labels_to_use
         """
 

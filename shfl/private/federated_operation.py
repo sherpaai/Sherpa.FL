@@ -6,8 +6,8 @@ from shfl.private.data import LabeledData
 class FederatedDataNode(DataNode):
     """
     This class represents a [DataNode](../data_node) in a FederatedData. Extends DataNode allowing
-    calls to methods without explicit private data identifier, assuming access to the federated data. 
-    
+    calls to methods without explicit private data identifier, assuming access to the federated data.
+
     It supports Adaptive Differential Privacy through Privacy Filters
 
     # Arguments:
@@ -125,7 +125,7 @@ class FederatedData:
         """
         Queries over every node and returns the answer of every node in a list
 
-        # Returns
+        # Returns:
             answer: List containing responses for every node
         """
         answer = []
@@ -154,14 +154,14 @@ def federate_array(array, num_data_nodes):
     Creates [FederatedData](./#federateddata-class) from an indexable array.
 
     The array will be divided using the first dimension.
-    
+
     It supports Adaptive Differential Privacy through Privacy Filters
 
     # Arguments:
         array: Indexable array with any number of dimensions
         num_data_nodes: Number of nodes to use
 
-    # Returns
+    # Returns:
         federated_array: [FederatedData](./#federateddata-class) with an array of size len(array)/num_data_nodes \
         in every node
     """

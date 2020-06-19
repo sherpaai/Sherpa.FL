@@ -33,6 +33,15 @@ class NormalDistribution(ProbabilityDistribution):
         self._std = std
 
     def sample(self, size):
+        """
+        This method provides a sample of the given size of a gaussian distributions
+
+        # Arguments:
+            size: size of the sample
+
+        # Returns:
+            Sample of a gaussian distribution of a given size
+        """
         return np.random.normal(self._mean, self._std, size)
 
 
@@ -72,6 +81,16 @@ class GaussianMixture(ProbabilityDistribution):
         self._weights = weights
 
     def sample(self, size):
+        """
+        This method provides a sample of the given size of a mixture of gaussian distributions
+
+        # Arguments:
+            size: size of the sample
+
+        # Returns:
+            Sample of a mixture of gaussian distributions of a given size
+        """
+
         mixture_idx = np.random.choice(len(self._weights), size=size, replace=True, p=self._weights)
 
         values = []

@@ -12,7 +12,6 @@ class ExceededPrivacyBudgetError(Exception):
         epsilon_delta: the privacy budget which has been surpassed
 
     # Arguments:
-        message: this text is shown in addition to the exception text
         epsilon_delta: the privacy budget which has been surpassed
     """
 
@@ -58,6 +57,17 @@ class AdaptiveDifferentialPrivacy(DPDataAccessDefinition):
         return self._epsilon_delta
 
     def apply(self, data, differentially_private_mechanism=None):
+        """
+        It applies a differentially private mechanism if the privacy budget allows it.
+        If the privacy budget is suparsed and exception (ExceededPrivacyBudgetError) is thrown.
+
+        # Arguments:
+            data: input data which is going to be accessed with differential privacy
+            differentially_private_mechanism: it is the provider of differential privacy
+
+        # Returns:
+            The application of the dp-mechanism to the input data, if the privacy budget is not exceeded
+        """
         differentially_private_mechanism_to_apply = self._get_data_access_definition(differentially_private_mechanism)
         self._private_data_epsilon_delta_access_history.append(differentially_private_mechanism_to_apply.epsilon_delta)
 
@@ -71,6 +81,17 @@ class AdaptiveDifferentialPrivacy(DPDataAccessDefinition):
             return differentially_private_mechanism_to_apply.apply(data)
 
     def _get_data_access_definition(self, data_access_definition):
+        """
+        This method checks if the given data access definition is differentially private,
+        if none is provided, it ensures that the default data access definition is
+        differentially private.
+
+        # Arguments:
+            data_access_definition: method to be checked for Differential Privacy
+
+        # Returns:
+            The given data_access_definition or the default one given in the constructor
+        """
         if data_access_definition is not None:
             _check_differentially_private_mechanism(data_access_definition)
             return data_access_definition
@@ -84,9 +105,8 @@ class AdaptiveDifferentialPrivacy(DPDataAccessDefinition):
 
             It implements the theorem 3.6 from Privacy Odometers and Filters: Pay-as-you-Go Composition.
 
-            # Arguments:
-                epsilon_delta_access_history: a list of the epsilon-delta expenses of each access
-                epsilon_delta: privacy budget specified for the accessed private data
+            # Returns:
+                It returns True if the privacy budget if surpassed, False otherwise.
 
             # References:
                 - [Privacy Odometers and Filters: Pay-as-you-Go Composition] (https://arxiv.org/abs/1605.08294)
@@ -101,9 +121,8 @@ class AdaptiveDifferentialPrivacy(DPDataAccessDefinition):
 
             It implements the theorem 5.1 from Privacy Odometers and Filters: Pay-as-you-Go Composition.
 
-            # Arguments:
-                epsilon_delta_access_history: a list of the epsilon-delta expenses of each access
-                epsilon_delta: privacy budget specified for the accessed private data
+            # Returns:
+                It returns True if the privacy budget if surpassed, False otherwise.
 
             # References:
                 - [Privacy Odometers and Filters: Pay-as-you-Go Composition] (https://arxiv.org/abs/1605.08294)
@@ -127,5 +146,12 @@ class AdaptiveDifferentialPrivacy(DPDataAccessDefinition):
 
 
 def _check_differentially_private_mechanism(data_access_mechanism):
+    """
+        This method ensures that the given data access mechanism provides Differential Privacy
+
+        # Arguments:
+            data_access_mechanism: mechanism to be checked
+    """
+
     if not hasattr(data_access_mechanism, 'epsilon_delta'):
         raise ValueError("You can't access differentially private data with a non differentially private mechanism")

@@ -18,7 +18,7 @@ class ClusterFedAvgAggregator(FederatedAggregator):
             clients_params: list of multi-dimensional (numeric) arrays. Each entry in the list contains the \
              model's parameters of one client.
 
-        # Returns
+        # Returns:
             aggregated_weights: aggregator weights representing the global learning model
         """
         clients_params_array = np.concatenate(clients_params)
