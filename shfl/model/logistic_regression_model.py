@@ -8,17 +8,12 @@ class LogisticRegressionModel(TrainableModel):
     """
     This class offers support for scikit-learn logistic regression model. It implements [TrainableModel](../Model/#trainablemodel-class)
 
-    # Attributes:
-        * **_model, _n_features**
-
     # Arguments:
         n_features: integer number of features (independent variables).
         classes: array of classes to predict. At least 2 classes must be provided.
         model_inputs: optional dictionary containing the [model input parameters](https://scikit-learn.org/stable/modules/generated/sklearn.linear_model.LogisticRegression.html)
     """
-    def __init__(self, n_features, classes, model_inputs=None):
-        if model_inputs is None:
-            model_inputs = {}
+    def __init__(self, n_features, classes, model_inputs={}):
         self._check_initialization(n_features, classes)
         self._model = LogisticRegression(**model_inputs)
         self._n_features = n_features
@@ -46,11 +41,8 @@ class LogisticRegressionModel(TrainableModel):
         """
         Implementation of abstract method of class [TrainableModel](../Model/#trainablemodel-class)
 
-        # Arguments:
+        Arguments:
             data: Data, array-like of shape (n_samples, n_features)
-
-        # Returns:
-            prediction: array with predictions fro data argument.
         """
         self._check_data(data)
         
@@ -63,15 +55,9 @@ class LogisticRegressionModel(TrainableModel):
         Implementation of abstract method of class [TrainableModel](../Model/#trainablemodel-class)
         Metrics for evaluating model's performance.
         
-        # Arguments:
+        Arguments:
             data: Data, array-like of shape (n_samples, n_features)
-            labels: Target classes, array-like of shape (n_samples,)
-
-        # Returns:
-            bas: balanced accuracy score [Balanced Accuracy](
-            https://scikit-learn.org/stable/modules/generated/sklearn.metrics.balanced_accuracy_score.html)
-            cks: cohen kappa score [Cohen's Kappa](
-            https://scikit-learn.org/stable/modules/generated/sklearn.metrics.cohen_kappa_score.html)
+            labels: Target classes, array-like of shape (n_samples,) 
         """
         self._check_data(data)
         self._check_labels(labels)
@@ -86,13 +72,9 @@ class LogisticRegressionModel(TrainableModel):
         """
         Implementation of abstract method of class [TrainableModel](../Model/#trainablemodel-class)
         
-        # Arguments:
+        Arguments:
             data: Data, array-like of shape (n_samples, n_features)
-            labels: Target classes, array-like of shape (n_samples,)
-
-        # Returns:
-            bas: balanced accuracy score [Balanced Accuracy](
-            https://scikit-learn.org/stable/modules/generated/sklearn.metrics.balanced_accuracy_score.html)
+            labels: Target classes, array-like of shape (n_samples,) 
         """
         self._check_data(data)
         self._check_labels(labels)
@@ -105,9 +87,6 @@ class LogisticRegressionModel(TrainableModel):
     def get_model_params(self):
         """
         Implementation of abstract method of class [TrainableModel](../Model/#trainablemodel-class)
-
-        # Returns:
-            params: array with intercept and coef param from model
         """
         
         return np.column_stack((self._model.intercept_, self._model.coef_))
@@ -115,19 +94,13 @@ class LogisticRegressionModel(TrainableModel):
     def set_model_params(self, params):
         """
         Implementation of abstract method of class [TrainableModel](../Model/#trainablemodel-class)
-
-        # Arguments:
-            params: array Dx2 with intercept and coef values.
         """
-        self._model.intercept_ = params[:, 0]
+        self._model.intercept_ = params[:,0]
         self._model.coef_ = params[:, 1:]
 
     def _check_data(self, data):
         """
         Method that checks whether the data dimension is correct.
-
-        # Arguments:
-            data: array with data to check
         """
         if data.ndim == 1:
             if self._n_features != 1:
@@ -139,18 +112,27 @@ class LogisticRegressionModel(TrainableModel):
 
     def _check_labels(self, labels):
         """
-        Method that checks whether the classes are correct.
-
+        Method that checks whether the classes are correct. 
+        The classes in client's data must be the same as the input ones.
+        
         # Arguments:
-            labels: array with labels to check
+            labels: array with classes
         """
         classes = np.unique(np.asarray(labels))
         if not np.array_equal(self._model.classes_, classes):
             raise AssertionError("Labels need to have the same classes described by the model, " + str(self._model.classes_)
                                  + ". Labels of this node are " + str(classes) + " .")
-
+    
     @staticmethod
     def _check_initialization(n_features, classes):
+        """
+        Method that checks if model's initialization is correct. 
+        The number of features must be an integer equal or greater to one, and there must be at least two classes.
+
+        # Arguments:
+            n_features: number of features
+            classes: array of classes to predict
+        """
         if not isinstance(n_features, int):
             raise AssertionError("n_features must be a positive integer number. Provided " + str(n_features) + " features.")
         if n_features < 0:
@@ -160,4 +142,6 @@ class LogisticRegressionModel(TrainableModel):
         if len(np.unique(classes)) != len(classes):
             classes = list(classes)
             duplicated_classes = [i_class for i_class in classes if classes.count(i_class) > 1]
-            raise AssertionError("No duplicated classes allowed. Class(es) duplicated: " + str(duplicated_classes))
+            raise AssertionError("No duplicated classes allowed. Class(es) duplicated: " + str(duplicated_classes) )
+           
+            

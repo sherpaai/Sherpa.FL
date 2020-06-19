@@ -140,7 +140,7 @@ class LinearRegressionModel(TrainableModel):
 
     def _check_labels(self, labels):
         """
-        Method that checks if the labels dimension if correct.
+        Method that checks if the labels dimension is correct.
 
         # Arguments:
             labels: array with labels
@@ -155,6 +155,13 @@ class LinearRegressionModel(TrainableModel):
 
     @staticmethod
     def _check_initialization(n):
+        """
+        Method that checks if model's initialization is correct. 
+        The number of features and targets must be an integer equal or greater to one.
+
+        # Arguments:
+            n: number of features or targets
+        """
         if not isinstance(n, int):
             raise AssertionError("n_features and n_targets must be a positive integer number. Provided value "
                                  + str(n) + ".")
