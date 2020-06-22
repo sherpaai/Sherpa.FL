@@ -167,7 +167,7 @@ PAGES = [
             federated_government.federated_images_classifier.ImagesDataBases,
             (federated_government.federated_linear_regression.FederatedLinearRegression, ['run_rounds',
                                                                                           'model_builder']),
-            federated_government.federated_linear_regression.LinearRegressionModel,
+            federated_government.federated_linear_regression.LinearRegressionDataBases,
             (federated_government.federated_clustering.FederatedClustering, ['run_rounds',
                                                                              'model_builder']),
             federated_government.federated_clustering.ClusteringDataBases,
