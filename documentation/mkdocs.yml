@@ -14,6 +14,8 @@ nav:
       - Data: private/data.md
       - Query: private/query.md
       - Federated Operation: private/federated_operation.md
+      - Federated Attack: private/federated_attack.md
+      - Reproducibility: private/reproducibility.md
   - Databases: databases.md
   - Data Distribution: data_distribution.md
   - Model: model.md
@@ -24,3 +26,5 @@ nav:
       - Sensitivity Sampler: differential_privacy/sensitivity_sampler.md
       - Norm: differential_privacy/norm.md
       - Probability Distribution: differential_privacy/probability_distribution.md
+      - Composition: differential_privacy/composition.md
+      - Sampling: differential_privacy/sampling.md

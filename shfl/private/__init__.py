@@ -14,4 +14,7 @@ from shfl.private.query import Query
 from shfl.private.query import Mean
 from shfl.private.query import IdentityFunction
 from shfl.private.reproducibility import Reproducibility
+from shfl.private.federated_attack import FederatedDataAttack
+from shfl.private.federated_attack import ShuffleNode
+from shfl.private.federated_attack import FederatedPoisoningDataAttack
 
