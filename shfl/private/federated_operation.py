@@ -34,26 +34,71 @@ class FederatedDataNode(DataNode):
         self._federated_data_identifier = federated_data_identifier
 
     def query(self, private_property=None, **kwargs):
+        """
+        Queries private data previously configured. If the access didn't configured this method will raise exception
+
+        # Arguments:
+            private_property: String with the key identifier for the data
+        """
         if private_property is None:
             private_property = self._federated_data_identifier
         return super().query(private_property, **kwargs)
 
     def configure_data_access(self, data_access_definition):
+        """
+        Adds a DataAccessDefinition for some concrete private data.
+
+        # Arguments:
+            data_access_definition: Policy to access data (see: [DataAccessDefinition](../data/#dataaccessdefinition))
+        """
         super().configure_data_access(self._federated_data_identifier, data_access_definition)
 
     def set_private_data(self, data):
+        """
+        Creates copy of data in private memory using name as key. If there is a previous value with this key the
+        data will be overridden.
+
+        # Arguments:
+            data: Data to be stored in the private memory of the DataNode
+        """
         super().set_private_data(self._federated_data_identifier, data)
 
     def set_private_test_data(self, data):
+        """
+        Creates copy of test data in private memory using name as key. If there is a previous value with this key the
+        data will be override.
+
+        # Arguments:
+            data: Data to be stored in the private memory of the DataNode
+        """
         super().set_private_test_data(self._federated_data_identifier, data)
 
     def train_model(self):
+        """
+        Train the model that has been previously set in the data node
+        """
         super().train_model(self._federated_data_identifier)
 
     def apply_data_transformation(self, federated_transformation):
+        """
+        Executes FederatedTransformation (see: [Federated Operation](../federated_operation)) over private data.
+
+        # Arguments:
+            federated_transformation: Operation to execute (see: [Federated Operation](../federated_operation))
+        """
         super().apply_data_transformation(self._federated_data_identifier, federated_transformation)
 
     def evaluate(self, data, test):
+        """
+        Evaluates the performance of the model
+
+        # Arguments:
+            data: Data to predict
+            test: True values of data
+
+        # Returns:
+            metrics: array with metrics values for predictions for data argument.
+        """
         return super().evaluate(data, test), super().local_evaluate(self._federated_data_identifier)
 
     def split_train_test(self, test_split=0.2):
