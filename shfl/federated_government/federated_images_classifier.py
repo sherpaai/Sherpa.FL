@@ -37,9 +37,6 @@ class FederatedImagesClassifier(FederatedGovernment):
     Class used to represent a high-level federated image classification
     (see: [FederatedGoverment](../federated_goverment/#federatedgoverment-class)).
 
-    # Attributes:
-        * **_test_data, _test_labels**
-
     # Arguments:
         data_base_name_key: key of the enumeration of valid data bases (see: [ImagesDataBases](./#imagesdatabases-class))
         iid: boolean which specifies if the distribution if IID (True) or non-IID (False) (True by default)

@@ -16,8 +16,10 @@ class DataNode:
     in order to learn. It is assumed that a model is represented by its parameters and the access to these parameters
     must be also configured before queries.
 
-    # Attributes:
-        * **_private_data, _private_test_data, _private_data_access_policies, _model, _model_access_policy**
+    # Properties:
+        model: access to the model
+        private_data: access to train data
+        private_data_test: access to test data
     """
 
     def __init__(self):

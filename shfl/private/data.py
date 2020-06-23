@@ -6,12 +6,13 @@ class LabeledData:
     """
     Class to represent labeled data
 
-    # Attributes:
-        * **_data, _label**
-
     # Arguments:
         data: Features representing a data sample
         label: Label for this sample
+
+    # Properties:
+        data: getter and setter for data
+        label: getter and setter for the data label
     """
     def __init__(self, data, label):
         self._data = data

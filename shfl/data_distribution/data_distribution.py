@@ -10,9 +10,6 @@ class DataDistribution(abc.ABC):
 
     # Arguments:
         database: Database to distribute. (see: [Databases](../../databases))
-
-    # Attributes:
-        database: Database to distribute. (see: [Databases](../../databases))
     """
 
     def __init__(self, database):

@@ -21,9 +21,6 @@ class NormalDistribution(ProbabilityDistribution):
     """
     Implements Normal Distribution
 
-    # Attributes:
-        * **_mean, _std**
-
     # Arguments:
         mean: Mean of the normal distribution.
         std: Standard deviation of the normal distribution
@@ -48,9 +45,6 @@ class NormalDistribution(ProbabilityDistribution):
 class GaussianMixture(ProbabilityDistribution):
     """
     Implements the combination of Normal Distributions
-
-    # Attributes:
-        * **_gaussian_distributions, _weights**
 
     # Arguments:
         params: Array of arrays with mean and std for every gaussian distribution.

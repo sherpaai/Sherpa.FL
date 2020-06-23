@@ -15,9 +15,6 @@ class Reproducibility:
     Is important to know that the reproducibility only works if you execute the experiment in CPU. Many ops in GPU
     like convolutions are not deterministic and the don't replicate.
 
-    # Attributes:
-        * **__seed, __seeds, __instance**
-
     # Arguments:
         seed: the main seed for server
 

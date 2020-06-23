@@ -106,9 +106,6 @@ class FederatedDataNode(DataNode):
         Splits private_data in train and test sets
 
         # Arguments:
-            training_data_key: String identifying the private data to use for this model. This key must contain
-            LabeledData (see: [Data](../../Data))
-
             test_split: percentage of test split
         """
         labeled_data = self._private_data.get(self._federated_data_identifier)
@@ -236,6 +233,13 @@ def apply_federated_transformation(federated_data, federated_transformation):
 
 
 def split_train_test(federated_data, test_split=0.2):
+    """
+    Splits all data nodes in train and test sets
+
+    # Arguments:
+        federated_data: [FederatedData](./#federateddata-class)
+        test_split: percentage of test split
+    """
     for data_node in federated_data:
         data_node.split_train_test(test_split)
 

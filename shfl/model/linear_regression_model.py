@@ -8,9 +8,6 @@ class LinearRegressionModel(TrainableModel):
     """
     This class offers support for scikit-learn linear regression model. It implements [TrainableModel](../Model/#trainablemodel-class)
 
-    # Attributes:
-        * **_model, _n_features, _n_targets**
-
     # Arguments:
         n_features: number of features (independent variables)
         n_targets: number of targets to predict (default is 1)

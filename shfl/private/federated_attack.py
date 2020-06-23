@@ -43,9 +43,6 @@ class FederatedPoisoningDataAttack(FederatedDataAttack):
 
     This class implements interface [FederatedDataAttack](./#federateddataattack-class).
 
-    # Attributes:
-        * **_percentage, _adversaries**
-
     # Arguments:
         percentage: percentage of nodes that are adversarial ones
 

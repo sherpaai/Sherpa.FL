@@ -143,5 +143,3 @@ class LogisticRegressionModel(TrainableModel):
             classes = list(classes)
             duplicated_classes = [i_class for i_class in classes if classes.count(i_class) > 1]
             raise AssertionError("No duplicated classes allowed. Class(es) duplicated: " + str(duplicated_classes) )
-           
-            

@@ -22,9 +22,6 @@ class RandomizedResponseCoins(DPDataAccessDefinition):
 
     This method is log(3)-differentially private
 
-    # Attributes:
-        * ** _prob_head_first, _prob_head_second, _epsilon_delta**
-
     # Arguments
         prob_head_first: float in [0,1] representing probability to use a random response instead of true value.
             This is equivalent to prob_head of the first coin flip algorithm described by Dwork.
@@ -89,9 +86,6 @@ class RandomizedResponseBinary(DPDataAccessDefinition):
     max { f0/(1-f1), f1/(1-f0)}
 
     Input data must be binary, otherwise exception will be raised.
-
-    # Attributes
-        * **_f0, _f1, _epsilon**
 
     # Arguments
         f0: float in [0,1] representing the probability of getting 0 when the input is 0
@@ -161,9 +155,6 @@ class LaplaceMechanism(DPDataAccessDefinition):
     a method to estimate the sensitivity of a query that maps the private data in a normed space
     (see: [SensitivitySampler](../sensitivity_sampler))
 
-    Attributes:
-        * **_sensitivity, _epsilon, _query**
-
     # Arguments:
         sensitivity: float or array representing sensitivity of the applied query
         epsilon: float for the epsilon you want to apply
@@ -225,9 +216,6 @@ class GaussianMechanism(DPDataAccessDefinition):
     a method to estimate the sensitivity of a query that maps the private data in a normed space
     (see: [SensitivitySampler](../sensitivity_sampler))
 
-    # Attributes:
-        * **_sensitivity, _epsilon_delta, _query**
-
     # Arguments:
         sensitivity: float or array representing l2-sensitivity of the applied query
         epsilon: float for the epsilon you want to apply
@@ -281,9 +269,6 @@ class ExponentialMechanism(DPDataAccessDefinition):
     """
     Implements the exponential mechanism differential privacy defined by Dwork in
     "The algorithmic Foundations of Differential Privacy".
-
-    # Attributes:
-        * **_u, _r, _delta_u, , _epsilon, _size**
 
     # Arguments:
         u: utility function with arguments x and r. It should be vectorized, so that for a \

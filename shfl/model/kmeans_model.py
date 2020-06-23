@@ -8,9 +8,6 @@ class KMeansModel(TrainableModel):
     """
     This class offers support for scikit-learn K-Means model. It implements [TrainableModel](../Model/#trainablemodel-class)
 
-    # Attributes:
-        * **_k_means, _init, _n_features, _n_init**
-
     # Arguments:
         n_clusters: number of clusters.
         init: Method of initialization. {‘k-means++’, ‘random’, ndarray}, default=’k-means++’.

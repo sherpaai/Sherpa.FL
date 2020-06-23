@@ -8,9 +8,6 @@ class DeepLearningModel(TrainableModel):
     """
     This class offers support for Keras and tensorflow models. It implements [TrainableModel](../Model/#trainablemodel-class)
 
-    # Attributes:
-        * **_model, _data_shape, _labels_shape, _batch_size, _epochs**
-
     # Arguments:
         model: Compiled model, ready to train
         batch_size: batch_size to apply
