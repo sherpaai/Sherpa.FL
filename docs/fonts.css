@@ -1,0 +1,100 @@
+
+/* Load your fonts here*/
+
+
+@font-face {
+  src: url("../fonts/Ubuntu-Regular.ttf");
+  font-family: "Ubuntu";
+  font-style: normal;
+  font-weight: 400;
+  font-display: fallback;
+}
+
+@font-face {
+  src: url("../fonts/Ubuntu-Italic.ttf");
+  font-family: "Ubuntu";
+  font-style: italic;
+  font-weight: 400;
+  font-display: fallback;
+}
+
+@font-face {
+  src: url("../fonts/Ubuntu-Medium.ttf");
+  font-family: "Ubuntu";
+  font-style: normal;
+  font-weight: 500;
+  font-display: fallback;
+}
+
+@font-face {
+  src: url("../fonts/Ubuntu-MediumItalic.ttf");
+  font-family: "Ubuntu";
+  font-style: italic;
+  font-weight: 500;
+  font-display: fallback;
+}
+
+@font-face {
+  src: url("../fonts/Ubuntu-Bold.ttf");
+  font-family: "Ubuntu";
+  font-style: normal;
+  font-weight: 600;
+  font-display: fallback;
+}
+
+@font-face {
+  src: url("../fonts/Ubuntu-BoldItalic.ttf");
+  font-family: "Ubuntu";
+  font-style: italic;
+  font-weight: 600;
+  font-display: fallback;
+}
+
+@font-face {
+  src: url("../fonts/Ubuntu-Light.ttf");
+  font-family: "Ubuntu";
+  font-style: normal;
+  font-weight: 300;
+  font-display: fallback;
+}
+
+@font-face {
+  src: url("../fonts/Ubuntu-LightItalic.ttf");
+  font-family: "Ubuntu";
+  font-style: italic;
+  font-weight: 300;
+  font-display: fallback;
+}
+
+@font-face {
+  src: url("../fonts/UbuntuMono-Regular.ttf");
+  font-family: "UbuntuMono";
+  font-style: normal;
+  font-weight: 400;
+  font-display: fallback;
+}
+
+@font-face {
+  src: url("../fonts/UbuntuMono-Italic.ttf");
+  font-family: "UbuntuMono";
+  font-style: italic;
+  font-weight: 400;
+  font-display: fallback;
+}
+
+@font-face {
+  src: url("../fonts/UbuntuMono-Bold.ttf");
+  font-family: "UbuntuMono";
+  font-style: normal;
+  font-weight: 600;
+  font-display: fallback;
+}
+
+@font-face {
+  src: url("../fonts/UbuntuMono-BoldItalic.ttf");
+  font-family: "UbuntuMono";
+  font-style: italic;
+  font-weight: 600;
+  font-display: fallback;
+}
+

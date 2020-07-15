@@ -419,10 +419,40 @@ def generate(sources_dir):
                     os.path.join(str(sources_dir), 'CONTRIBUTING.md'))
     shutil.copyfile(os.path.join(str(shfl_dir), 'docs/logo.png'),
                     os.path.join(str(sources_dir), 'logo.png'))
+
     if not os.path.exists(os.path.join(str(sources_dir), 'stylesheets')):
         os.makedirs(os.path.join(str(sources_dir), 'stylesheets'))
     shutil.copyfile(os.path.join(str(shfl_dir), 'docs/sherpa.css'),
                     os.path.join(str(sources_dir), 'stylesheets/sherpa.css'))
+    shutil.copyfile(os.path.join(str(shfl_dir), 'docs/fonts.css'),
+                    os.path.join(str(sources_dir), 'stylesheets/fonts.css'))
+
+    if not os.path.exists(os.path.join(str(sources_dir), 'fonts')):
+        os.makedirs(os.path.join(str(sources_dir), 'fonts'))
+    shutil.copyfile(os.path.join(str(shfl_dir), 'docs/fonts/Ubuntu-Bold.ttf'),
+                    os.path.join(str(sources_dir), 'fonts/Ubuntu-Bold.ttf'))
+    shutil.copyfile(os.path.join(str(shfl_dir), 'docs/fonts/Ubuntu-BoldItalic.ttf'),
+                    os.path.join(str(sources_dir), 'fonts/Ubuntu-BoldItalic.ttf'))
+    shutil.copyfile(os.path.join(str(shfl_dir), 'docs/fonts/Ubuntu-Italic.ttf'),
+                    os.path.join(str(sources_dir), 'fonts/Ubuntu-Italic.ttf'))
+    shutil.copyfile(os.path.join(str(shfl_dir), 'docs/fonts/Ubuntu-Light.ttf'),
+                    os.path.join(str(sources_dir), 'fonts/Ubuntu-Light.ttf'))
+    shutil.copyfile(os.path.join(str(shfl_dir), 'docs/fonts/Ubuntu-LightItalic.ttf'),
+                    os.path.join(str(sources_dir), 'fonts/Ubuntu-LightItalic.ttf'))
+    shutil.copyfile(os.path.join(str(shfl_dir), 'docs/fonts/Ubuntu-Medium.ttf'),
+                    os.path.join(str(sources_dir), 'fonts/Ubuntu-Medium.ttf'))
+    shutil.copyfile(os.path.join(str(shfl_dir), 'docs/fonts/Ubuntu-MediumItalic.ttf'),
+                    os.path.join(str(sources_dir), 'fonts/Ubuntu-MediumItalic.ttf'))
+    shutil.copyfile(os.path.join(str(shfl_dir), 'docs/fonts/Ubuntu-Regular.ttf'),
+                    os.path.join(str(sources_dir), 'fonts/Ubuntu-Regular.ttf'))
+    shutil.copyfile(os.path.join(str(shfl_dir), 'docs/fonts/UbuntuMono-Bold.ttf'),
+                    os.path.join(str(sources_dir), 'fonts/UbuntuMono-Bold.ttf'))
+    shutil.copyfile(os.path.join(str(shfl_dir), 'docs/fonts/UbuntuMono-BoldItalic.ttf'),
+                    os.path.join(str(sources_dir), 'fonts/UbuntuMono-BoldItalic.ttf'))
+    shutil.copyfile(os.path.join(str(shfl_dir), 'docs/fonts/UbuntuMono-Italic.ttf'),
+                    os.path.join(str(sources_dir), 'fonts/UbuntuMono-Italic.ttf'))
+    shutil.copyfile(os.path.join(str(shfl_dir), 'docs/fonts/UbuntuMono-Regular.ttf'),
+                    os.path.join(str(sources_dir), 'fonts/UbuntuMono-Regular.ttf'))
 
 
 if __name__ == '__main__':
