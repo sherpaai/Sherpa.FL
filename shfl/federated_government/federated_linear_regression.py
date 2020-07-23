@@ -9,7 +9,7 @@ from enum import Enum
 
 class LinearRegressionDataBases(Enum):
     """
-    Enumeration of possible databases for clustering.
+    Enumeration of possible databases for linear regression.
     """
     CALIFORNIA = CaliforniaHousing
 
@@ -66,7 +66,7 @@ class FederatedLinearRegression(FederatedGovernment):
                 self.evaluate_global_model(self._test_data, self._test_labels)
                 print("\n\n")
         else:
-            print("Federated images classifier is not properly initialised")
+            print("Federated linear regression is not properly initialised")
 
     def model_builder(self):
         """

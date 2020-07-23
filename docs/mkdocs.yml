@@ -1,8 +1,12 @@
 site_name: Sherpa.ai Federated Learning Framework
 docs_dir: sources
+extra_css:
+  - stylesheets/fonts.css
+  - stylesheets/sherpa.css
+extra_javascript:
+  - js/sherpa.js
 theme:
   name: "material"
-  logo: "logo.png"
 extra_css:
   - stylesheets/sherpa.css
   - stylesheets/fonts.css

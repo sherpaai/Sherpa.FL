@@ -80,7 +80,8 @@ def class_to_source_link(cls):
     line = inspect.getsourcelines(cls)[-1]
     link = ('https://github.com/sherpaai/'
             'Sherpa.ai-Federated-Learning-Framework/blob/master/' + path + '#L' + str(line))
-    return '[[source]](' + link + ')'
+
+    return '<a href="' + link + '" target="_blank">[source]</a>'
 
 
 def code_snippet(snippet):
@@ -454,6 +455,10 @@ def generate(sources_dir):
     shutil.copyfile(os.path.join(str(shfl_dir), 'docs/fonts/UbuntuMono-Regular.ttf'),
                     os.path.join(str(sources_dir), 'fonts/UbuntuMono-Regular.ttf'))
 
+    if not os.path.exists(os.path.join(str(sources_dir), 'js')):
+        os.makedirs(os.path.join(str(sources_dir), 'js'))
+    shutil.copyfile(os.path.join(str(shfl_dir), 'docs/sherpa.js'),
+                    os.path.join(str(sources_dir), 'js/sherpa.js'))
 
 if __name__ == '__main__':
     generate(os.path.join(str(shfl_dir), 'docs', 'sources'))

@@ -1,0 +1,1 @@
+document.getElementsByClassName("md-footer-meta")[0].remove();

@@ -123,7 +123,7 @@ PAGES = [
             model.deep_learning_model.DeepLearningModel,
             model.linear_regression_model.LinearRegressionModel,
             model.kmeans_model.KMeansModel,
-            model.logistic_regression_model.LogisticRegressionModel
+            model.linear_classifier_model.LinearClassifierModel
         ]
     },
     {

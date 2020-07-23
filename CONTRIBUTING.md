@@ -33,7 +33,7 @@ The following are the basic conventions that we are using in this project.
 
 #### Github Workflow
 
-The main strategy that we are using is the "Feature Branch Workflow" that is very well described [here](https://www.atlassian.com/git/tutorials/comparing-workflows/feature-branch-workflow) (in this case for Bitbucket, but the same can be applied for github).
+The main strategy that we are using is the "Forking Workflow" that is very well described [here](https://www.atlassian.com/git/tutorials/comparing-workflows/forking-workflow) (in this case for Bitbucket, but the same can be applied for github).
 
 #### Code Style
 
