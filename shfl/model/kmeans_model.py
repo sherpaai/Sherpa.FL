@@ -17,15 +17,16 @@ class KMeansModel(TrainableModel):
     """
 
     def __init__(self, n_clusters, n_features, init='k-means++', n_init=10):
-        self._k_means = KMeans(n_clusters=n_clusters, init=init, n_init=n_init)
+        self._model = KMeans(n_clusters=n_clusters, init=init, n_init=n_init)
         self._init = init
         self._n_features = n_features
         self._n_init = n_init
+        self._model._n_threads = None # compatibility: should be removed from scikit-learn
 
         if type(init) is np.ndarray:
-            self._k_means.cluster_centers_ = init
+            self._model.cluster_centers_ = init
         else:
-            self._k_means.cluster_centers_ = np.zeros((n_clusters, n_features))
+            self._model.cluster_centers_ = np.zeros((n_clusters, n_features))
 
     def train(self, data, labels=None):
         """
@@ -35,7 +36,7 @@ class KMeansModel(TrainableModel):
             data: Data, array-like of shape (n_samples, n_features)
             labels: None.
         """
-        self._k_means.fit(data)
+        self._model.fit(data)
 
     def predict(self, data):
         """
@@ -47,7 +48,7 @@ class KMeansModel(TrainableModel):
         # Returns:
             predicted_labels: array with prediction labels for data argument.
         """
-        predicted_labels = self._k_means.predict(data)
+        predicted_labels = self._model.predict(data)
         return predicted_labels
 
     def evaluate(self, data, labels):
@@ -101,7 +102,7 @@ class KMeansModel(TrainableModel):
         # Returns:
             centers: array with cluster centers kmeans model.
         """
-        return self._k_means.cluster_centers_
+        return self._model.cluster_centers_
 
     def set_model_params(self, params):
         """
@@ -114,4 +115,4 @@ class KMeansModel(TrainableModel):
             self.__init__(n_clusters=params.shape[0], n_features=self._n_features, init=self._init,
                           n_init=self._n_init)
         else:
-            self.__init__(n_clusters=params.shape[0], n_features=self._n_features, init=params, n_init=self._n_init)
+            self.__init__(n_clusters=params.shape[0], n_features=self._n_features, init=params, n_init=1)
