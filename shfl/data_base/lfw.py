@@ -1,4 +1,4 @@
-import sklearn.datasets
+from sklearn.datasets import fetch_lfw_people
 from shfl.data_base import data_base as db
 
 

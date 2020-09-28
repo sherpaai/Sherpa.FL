@@ -1,6 +1,6 @@
 from tensorflow.python.keras.utils.data_utils import get_file
+import numpy as np
 
-import sklearn.datasets
 from shfl.data_base import data_base as db
 
 
@@ -18,18 +18,18 @@ class Purchase100(db.DataBase):
         """
 
         path_features = get_file(
-        "https://github.com/xehartnort/Purchase100-dataset/releases/download/v1.0/purchase100_features.npy.zip",
-        origin="",
-        extract=True,
-        file_hash= "b0c8c072d80959dfc161f2928aac1c00", # md5 hash
-        cache_dir='~/.sherpa-ai')
+            "puchase100_features",
+            origin="https://github.com/xehartnort/Purchase100-dataset/releases/download/v1.0/purchase100_features.npy.zip",
+            extract=True,
+            file_hash= "b0c8c072d80959dfc161f2928aac1c00", # md5 hash
+            cache_dir='~/.sherpa-ai')
 
         path_labels = get_file(
-        "https://github.com/xehartnort/Purchase100-dataset/releases/download/v1.0/purchase100_labels.npy.zip",
-        origin="",
-        extract=True,
-        file_hash= "7b7409c4897f86889dd08a916dd9a111", # md5 hash
-        cache_dir='~/.sherpa-ai')
+            "puchase100_labels",
+            origin="https://github.com/xehartnort/Purchase100-dataset/releases/download/v1.0/purchase100_labels.npy.zip",
+            extract=True,
+            file_hash= "7b7409c4897f86889dd08a916dd9a111", # md5 hash
+            cache_dir='~/.sherpa-ai')
 
         data = np.load(path_features)
         labels = np.load(path_labels)
