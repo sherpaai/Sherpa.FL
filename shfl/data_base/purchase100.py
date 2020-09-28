@@ -18,21 +18,15 @@ class Purchase100(db.DataBase):
         """
 
         path_features = get_file(
-            "puchase100_features",
-            origin="https://github.com/xehartnort/Purchase100-dataset/releases/download/v1.0/purchase100_features.npy.zip",
+            "purchase100",
+            origin="https://github.com/xehartnort/Purchase100-dataset/releases/download/v1.1/purchase100.npz",
             extract=True,
-            file_hash= "b0c8c072d80959dfc161f2928aac1c00", # md5 hash
+            file_hash= "0d7538b9806e7ee622e1a252585e7768", # md5 hash
             cache_dir='~/.sherpa-ai')
 
-        path_labels = get_file(
-            "puchase100_labels",
-            origin="https://github.com/xehartnort/Purchase100-dataset/releases/download/v1.0/purchase100_labels.npy.zip",
-            extract=True,
-            file_hash= "7b7409c4897f86889dd08a916dd9a111", # md5 hash
-            cache_dir='~/.sherpa-ai')
-
-        data = np.load(path_features)
-        labels = np.load(path_labels)
+        all_data = np.load(path_features)
+        data = all_data['features']
+        labels = all_data['labels']
 
         test_size = int(len(data) * 0.1)
         self._train_data, self._train_labels,\
