@@ -16,11 +16,11 @@ def test_kmeans_model(mock_kmeans):
     kmm = KMeansModel(n_clusters, n_features, init, n_init)
 
     mock_kmeans.assert_called_once_with(n_clusters=n_clusters, init=init, n_init=n_init)
-    assert model == kmm._k_means
+    assert model == kmm._model
     assert init == kmm._init
     assert n_features == kmm._n_features
     assert n_init == kmm._n_init
-    assert np.array_equal(np.zeros((n_clusters, n_features)), kmm._k_means.cluster_centers_)
+    assert np.array_equal(np.zeros((n_clusters, n_features)), kmm._model.cluster_centers_)
 
 
 @patch('shfl.model.kmeans_model.KMeans')
@@ -35,11 +35,11 @@ def test_kmeans_model_ndarray(mock_kmeans):
     kmm = KMeansModel(n_clusters, n_features, init, n_init)
 
     mock_kmeans.assert_called_once_with(n_clusters=n_clusters, init=init, n_init=n_init)
-    assert model == kmm._k_means
+    assert model == kmm._model
     assert np.array_equal(init, kmm._init)
     assert n_init == kmm._n_init
     assert n_features == kmm._n_features
-    assert np.array_equal(init, kmm._k_means.cluster_centers_)
+    assert np.array_equal(init, kmm._model.cluster_centers_)
 
 
 @patch('shfl.model.kmeans_model.KMeans')
@@ -137,7 +137,7 @@ def test_get_model_params(mock_kmeans):
 
     model_params = kmm.get_model_params()
 
-    assert np.array_equal(kmm._k_means.cluster_centers_, model_params)
+    assert np.array_equal(kmm._model.cluster_centers_, model_params)
 
 
 @patch('shfl.model.kmeans_model.KMeans')
@@ -148,18 +148,18 @@ def test_set_model_params(mock_kmeans):
     n_clusters = 5
     n_features = 5
     init = 'k-means++'
-    n_init = 10
+    n_init = 1 # Explicit initial center position passed: performing only one init  
     kmm = KMeansModel(n_clusters, n_features, init, n_init)
 
     params = np.random.rand(10).reshape((5, 2))
 
     kmm.set_model_params(params)
 
-    assert model == kmm._k_means
+    assert model == kmm._model
     assert np.array_equal(params, kmm._init)
     assert n_init == kmm._n_init
     assert n_features == kmm._n_features
-    assert np.array_equal(params, kmm._k_means.cluster_centers_)
+    assert np.array_equal(params, kmm._model.cluster_centers_)
 
 
 @patch('shfl.model.kmeans_model.KMeans')
@@ -177,11 +177,11 @@ def test_set_model_params_zeros_array(mock_kmeans):
 
     kmm.set_model_params(params)
 
-    assert model == kmm._k_means
+    assert model == kmm._model
     assert init == kmm._init
     assert n_init == kmm._n_init
     assert n_features == kmm._n_features
-    assert np.array_equal(np.zeros((params.shape[0], n_features)), kmm._k_means.cluster_centers_)
+    assert np.array_equal(np.zeros((params.shape[0], n_features)), kmm._model.cluster_centers_)
 
 
 @patch('shfl.model.kmeans_model.metrics.v_measure_score')
