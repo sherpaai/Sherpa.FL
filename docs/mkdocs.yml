@@ -13,6 +13,13 @@ extra_css:
 plugins:
   - search
   - mkdocstrings
+markdown_extensions:
+  - pymdownx.arithmatex:
+      generic: true
+extra_javascript:
+  - javascripts/config.js
+  - https://polyfill.io/v3/polyfill.min.js?features=es6
+  - https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js
 nav:
   - Home: index.md
   - Getting started: getting-started.md
@@ -26,7 +33,11 @@ nav:
       - Reproducibility: private/reproducibility.md
   - Databases: databases.md
   - Data Distribution: data_distribution.md
-  - Model: model.md
+  - Model:
+      - Overview: model.md
+      - Supervised Learning: model/supervised.md
+      - Unsupervised Learning: model/unsupervised.md
+      - Recommender Systems: model/recommender.md
   - Federated Aggregator: federated_aggregator.md
   - Federated Government: federated_government.md
   - Differential Privacy:

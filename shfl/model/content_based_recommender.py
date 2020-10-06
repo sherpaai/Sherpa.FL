@@ -29,13 +29,32 @@ def _check_no_new_items(data, df_items):
 class ContentBasedRecommender(Recommender):
     """
     Implementation of a content-based recommender using \
-        [Recommender](../model/#recommender-class)
+        [Recommender](../model/#recommender-class).
 
-    This class needs the object df_items that must be a pandas dataframe that contains the numeric
-    features of the items. The data that is used to train the model and to make predictions is a numpy array in
+    # Arguments:
+        df_items: pandas dataframe that contains the numeric features of the items.
+
+    The data that is used to train
+    the model and to make predictions is a numpy array in
     which the first column specifies the client and the second the item. There can be no items in the data that
-    no not appear in the catalog df_item. Therefore, the index of df_items must contain every value in the second
+    do not appear in the catalog df_item. Therefore, the index of df_items must contain every value in the second
     column of data.
+
+    The training at each node works as follows. Each item $i$ has a vector $v_i$ of features which can be used to
+    compute a user profile, given by
+    $$
+    p_u =     \\frac{1}{|\\mathcal K_u|} \\sum_{i\\in\\mathcal K_u} (r_{ui} - \\mu)\\, v_i
+    $$
+    where $\\mathcal K_u$ is the set of items that the user has interacted with, $r_{ui}$ is the rating that the user
+    has given to the item and $\\mu$ is the mean value of the rating.
+
+    Given the user profile, the estimated interaction with an item $i$ can be computed by taking the inner product
+    between the user and item profiles,
+    $$
+    \\hat r_{ui} = \\mu + p_u\\cdot v_i\\,.
+    $$
+    Clearly, the central node does not need to know anything about the user since all the computations are done
+    at his node.
     """
 
     def __init__(self, df_items):

@@ -123,10 +123,26 @@ PAGES = [
         'classes': [
             (model.model.TrainableModel, ["train", "predict", "evaluate", "get_model_params", "set_model_params",
                                           'performance']),
+        ]
+    },
+    {
+        'page': 'model/supervised.md',
+        'classes': [
             model.deep_learning_model.DeepLearningModel,
             model.linear_regression_model.LinearRegressionModel,
-            model.kmeans_model.KMeansModel,
             model.linear_classifier_model.LinearClassifierModel,
+
+        ]
+    },
+    {
+        'page': 'model/unsupervised.md',
+        'classes': [
+            model.kmeans_model.KMeansModel,
+        ]
+    },
+    {
+        'page': 'model/recommender.md',
+        'classes': [
             model.recommender.Recommender,
             model.mean_recommender.MeanRecommender,
             model.content_based_recommender.ContentBasedRecommender,

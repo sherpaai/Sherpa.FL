@@ -5,8 +5,10 @@ from shfl.model.recommender import Recommender
 
 class MeanRecommender(Recommender):
     """
-    Implementation of a simple recommender that recommends the mean value using \
-        [Recommender](../model/#recommender-class)
+    Implementation of a simple recommender using [Recommender](../model/#recommender-class).
+
+    For each client, given a set of labels in the training set, the recommender computes the mean value
+    and uses it to make predictions.
     """
 
     def __init__(self):
