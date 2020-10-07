@@ -3,8 +3,6 @@ docs_dir: sources
 extra_css:
   - stylesheets/fonts.css
   - stylesheets/sherpa.css
-extra_javascript:
-  - js/sherpa.js
 theme:
   name: "material"
 extra_css:
@@ -17,7 +15,7 @@ markdown_extensions:
   - pymdownx.arithmatex:
       generic: true
 extra_javascript:
-  - javascripts/config.js
+  - js/sherpa.js
   - https://polyfill.io/v3/polyfill.min.js?features=es6
   - https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js
 nav:
