@@ -17,7 +17,7 @@ class FederatedGovernment:
         self._model = model_builder()
         self._aggregator = aggregator
         for data_node in federated_data:
-            data_node.model = model_builder()
+            data_node.model = self._model
             if model_params_access is not None:
                 data_node.configure_model_params_access(model_params_access)
 
