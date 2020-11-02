@@ -129,6 +129,7 @@ PAGES = [
         'page': 'model/supervised.md',
         'classes': [
             model.deep_learning_model.DeepLearningModel,
+            model.deep_learning_model_pt.DeepLearningModelPyTorch,
             model.linear_regression_model.LinearRegressionModel,
             model.linear_classifier_model.LinearClassifierModel,
 
