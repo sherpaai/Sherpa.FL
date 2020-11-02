@@ -76,6 +76,7 @@ class DeepLearningModelPyTorch(TrainableModel):
         dataloader = DataLoader(dataset, self._batch_size, False)
 
         y_pred = []
+        self._model.to(self._device)
         with torch.no_grad():
             for element in dataloader:
                 inputs = element[0].to(self._device)
@@ -117,10 +118,10 @@ class DeepLearningModelPyTorch(TrainableModel):
             labels_t = torch.from_numpy(labels)
             val_loss = self._criterion(all_y_pred, torch.argmax(labels_t, -1))
 
-            correct_predict = (torch.argmax(all_y_pred, -1) == torch.argmax(labels_t, -1)).sum().float()
+            correct_predict = (torch.argmax(all_y_pred, -1).numpy() == torch.argmax(labels_t, -1).numpy()).sum()
             val_acc = correct_predict / len(labels)
 
-            metrics = [val_loss.item(), val_acc.item()]
+            metrics = [val_loss.item(), val_acc]
             if self._metrics is not None:
                 for name, metric in self._metrics.items():
                     metrics.append(metric(all_y_pred.cpu().numpy(), labels))
@@ -179,14 +180,3 @@ class DeepLearningModelPyTorch(TrainableModel):
         if labels.shape[-1] != self._labels_shape:
             raise AssertionError("Labels need to have the same shape described by the model " + str(self._labels_shape)
                                  + " .Current data has shape " + str(labels.shape[1:]))
-
-    def __deepcopy__(self, memo):
-        """
-        Overwrite deepcopy method
-        """
-        cls = self.__class__
-        result = cls.__new__(cls)
-        memo[id(self)] = result
-        for k, v in self.__dict__.items():
-            setattr(result, k, copy.deepcopy(v, memo))
-        return result
