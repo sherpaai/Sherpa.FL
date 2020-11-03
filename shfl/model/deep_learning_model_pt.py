@@ -1,8 +1,8 @@
-from shfl.model.model import TrainableModel
+import numpy as np
 import torch
 from torch.utils.data import TensorDataset, DataLoader
-import numpy as np
-import copy
+
+from shfl.model.model import TrainableModel
 
 
 class DeepLearningModelPyTorch(TrainableModel):
@@ -20,8 +20,8 @@ class DeepLearningModelPyTorch(TrainableModel):
     """
     def __init__(self, model, criterion, optimizer, batch_size=32, epochs=1, metrics=None, device="cpu"):
         self._model = model
-        self._data_shape = model[0].in_channels
-        self._labels_shape = model[-2].out_features
+        self._data_shape = self.get_model_params()[0].shape[1]
+        self._labels_shape = self.get_model_params()[-1].shape
         self._criterion = criterion
         self._optimizer = optimizer
 
@@ -47,13 +47,15 @@ class DeepLearningModelPyTorch(TrainableModel):
         self._model.to(self._device)
         for t in range(self._epochs):
             for element in trainloader:
-                inputs, y_true = element[0].to(self._device), element[1].to(self._device)
+                inputs, y_true = element[0].float().to(self._device), element[1].float().to(self._device)
 
                 self._optimizer.zero_grad()
 
                 y_pred = self._model(inputs)
 
-                loss = self._criterion(y_pred, torch.argmax(y_true, -1))
+                if y_true.shape[1] > 1:
+                   y_true = torch.argmax(y_true, -1)
+                loss = self._criterion(y_pred, y_true)
 
                 self._model.zero_grad()
 
@@ -79,9 +81,9 @@ class DeepLearningModelPyTorch(TrainableModel):
         self._model.to(self._device)
         with torch.no_grad():
             for element in dataloader:
-                inputs = element[0].to(self._device)
+                inputs = element[0].float().to(self._device)
 
-                batch_y_pred = torch.argmax(self._model(inputs), -1)
+                batch_y_pred = self._model(inputs)
 
                 y_pred.extend(batch_y_pred.cpu().numpy())
 
@@ -101,27 +103,16 @@ class DeepLearningModelPyTorch(TrainableModel):
         self._check_data(data)
         self._check_labels(labels)
 
-        dataset = TensorDataset(torch.from_numpy(data), torch.from_numpy(labels))
-        dataloader = DataLoader(dataset, self._batch_size, False)
-
-        self._model.to(self._device)
-        all_y_pred = []
         with torch.no_grad():
-            for element in dataloader:
-                inputs, y_true = element[0].to(self._device), element[1].to(self._device)
+            all_y_pred = self.predict(data)
 
-                y_pred = self._model(inputs)
+            all_y_pred = torch.from_numpy(all_y_pred).float()
+            labels_t = torch.from_numpy(labels).float()
+            if labels_t.shape[1] > 1:
+                labels_t = torch.argmax(labels_t, -1)
+            val_loss = self._criterion(all_y_pred, labels_t)
 
-                all_y_pred.extend(y_pred.cpu().numpy())
-
-            all_y_pred = torch.from_numpy(np.array(all_y_pred))
-            labels_t = torch.from_numpy(labels)
-            val_loss = self._criterion(all_y_pred, torch.argmax(labels_t, -1))
-
-            correct_predict = (torch.argmax(all_y_pred, -1).numpy() == torch.argmax(labels_t, -1).numpy()).sum()
-            val_acc = correct_predict / len(labels)
-
-            metrics = [val_loss.item(), val_acc]
+            metrics = [val_loss.item()]
             if self._metrics is not None:
                 for name, metric in self._metrics.items():
                     metrics.append(metric(all_y_pred.cpu().numpy(), labels))
@@ -163,7 +154,7 @@ class DeepLearningModelPyTorch(TrainableModel):
         """
         with torch.no_grad():
             for ant, post in zip(self._model.parameters(), params):
-                ant.data = torch.from_numpy(post)
+                ant.data = torch.from_numpy(post).float()
 
     def _check_data(self, data):
         """
@@ -177,6 +168,6 @@ class DeepLearningModelPyTorch(TrainableModel):
         """
         Method that checks if the labels dimension if correct.
         """
-        if labels.shape[-1] != self._labels_shape:
+        if labels.shape[1:] != self._labels_shape:
             raise AssertionError("Labels need to have the same shape described by the model " + str(self._labels_shape)
-                                 + " .Current data has shape " + str(labels.shape[1:]))
+                                 + " .Current labels has shape " + str(labels.shape[1:]))

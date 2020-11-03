@@ -1,6 +1,7 @@
 import random
 import numpy as np
 import tensorflow as tf
+import torch
 
 
 class Reproducibility:
@@ -64,6 +65,7 @@ class Reproducibility:
         np.random.seed(self.__seeds[id])
         random.seed(self.__seeds[id])
         tf.random.set_seed(self.__seeds[id])
+        torch.manual_seed(self.__seeds[id])
 
     @property
     def seed(self):
