@@ -75,14 +75,14 @@ class NonIidDataDistribution(SamplingDataDistribution):
         else:
             one_hot = True
 
-        num_data = len(data)
-
         # Shuffle data
         data, labels = shuffle_rows(data, labels)
 
         # Select percent
-        data = data[0:int(percent * num_data / 100)]
+        data = data[0:int(percent * len(data) / 100)]
         labels = labels[0:int(percent * len(labels) / 100)]
+
+        num_data = len(data)
 
         # We generate random classes for each client
         total_labels = np.unique(labels.argmax(axis=-1))

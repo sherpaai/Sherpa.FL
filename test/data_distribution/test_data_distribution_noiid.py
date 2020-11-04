@@ -103,7 +103,7 @@ def test_make_data_federated_wrong_weights():
     for data in all_data:
         idx.append(np.where((data == train_data).all(axis=1))[0][0])
 
-    seed_weights = [26, 16, 1]
+    seed_weights = [26, 28, 5]
     for i, weight in enumerate(weights):
         assert federated_data[i].shape[0] == seed_weights[i]
 
