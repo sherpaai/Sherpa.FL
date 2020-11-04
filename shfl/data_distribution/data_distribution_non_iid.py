@@ -75,11 +75,13 @@ class NonIidDataDistribution(SamplingDataDistribution):
         else:
             one_hot = True
 
+        num_data = len(data)
+
         # Shuffle data
         data, labels = shuffle_rows(data, labels)
 
         # Select percent
-        data = data[0:int(percent * len(data) / 100)]
+        data = data[0:int(percent * num_data / 100)]
         labels = labels[0:int(percent * len(labels) / 100)]
 
         # We generate random classes for each client
@@ -100,7 +102,7 @@ class NonIidDataDistribution(SamplingDataDistribution):
                 # Shuffle data
                 data_aux, labels_aux = shuffle_rows(data_aux, labels_aux)
 
-                percent_per_client = min(int(weights[i]*len(data)), len(data_aux))
+                percent_per_client = min(int(weights[i]*num_data), len(data_aux))
 
                 federated_data.append(np.array(data_aux[0:percent_per_client, ]))
                 federated_label.append(np.array(labels_aux[0:percent_per_client, ]))
@@ -118,12 +120,9 @@ class NonIidDataDistribution(SamplingDataDistribution):
                 labels_aux = labels[idx]
                 rest_labels = labels[~idx]
 
-                randomize = np.arange(len(labels_aux))
-                np.random.shuffle(randomize)
-                data_aux = data_aux[randomize, ]
-                labels_aux = labels_aux[randomize]
+                data_aux, labels_aux = shuffle_rows(data_aux, labels_aux)
 
-                percent_per_client = min(int(weights[i] * len(data)), len(data_aux))
+                percent_per_client = min(int(weights[i] * num_data), len(data_aux))
 
                 federated_data.append(np.array(data_aux[0:percent_per_client, ]))
                 rest_data = np.append(rest_data, data_aux[percent_per_client:, ], axis=0)
