@@ -115,6 +115,8 @@ class FederatedImagesClassifier(FederatedGovernment):
         model.add(tf.keras.layers.Dense(64, activation='relu'))
         model.add(tf.keras.layers.Dense(10, activation='softmax'))
 
-        model.compile(optimizer="rmsprop", loss="categorical_crossentropy", metrics=["accuracy"])
+        criterion = tf.keras.losses.CategoricalCrossentropy()
+        optimizer = tf.keras.optimizers.RMSprop()
+        metrics = [tf.keras.metrics.CategoricalAccuracy()]
 
-        return DeepLearningModel(model)
+        return DeepLearningModel(model=model, criterion=criterion, optimizer=optimizer, metrics=metrics)
