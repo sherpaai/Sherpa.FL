@@ -23,6 +23,9 @@ class TestDeepLearningModel(DeepLearningModel):
 def test_deep_learning_model_private_data():
     model = Mock()
     layer = Mock
+    criterion = Mock()
+    optimizer = Mock()
+    metrics = Mock()
 
     sizes = [(30, 64, 64), (64, 10)]
 
@@ -34,35 +37,25 @@ def test_deep_learning_model_private_data():
 
     batch = 32
     epoch = 2
-    dpl = TestDeepLearningModel(model, batch, epoch)
+    dpl = TestDeepLearningModel(model, criterion, optimizer, batch, epoch, metrics)
+
+    dpl._model.compile.assert_called_once_with(optimizer=dpl._optimizer, loss=dpl._criterion, metrics=dpl._metrics)
 
     assert dpl._model.id == model.id
     assert dpl._batch_size == batch
     assert dpl._epochs == epoch
     assert np.array_equal(dpl._data_shape, sizes[0][1:])
     assert np.array_equal(dpl._labels_shape, sizes[1][1:])
-
-
-def test_deep_learning_model_initialized():
-    model = tf.keras.models.Sequential()
-    model.add(tf.keras.layers.Dense(12, input_shape=(28, 28, 1)))
-    model.add(tf.keras.layers.Dense(1))
-    model.compile(optimizer='rmsprop', loss='binary_crossentropy')
-
-    dpl = TestDeepLearningModel(model)
-
-    weights = np.concatenate([w.ravel() for w in model.get_weights()])
-    weights_model = np.concatenate([w.ravel() for w in dpl._model.get_weights()])
-
-    assert np.array_equal(weights_model, weights)
-    assert model.get_config() == dpl._model.get_config()
-    assert model.optimizer.__class__.__name__ == dpl._model.optimizer.__class__.__name__
-    assert model.loss == dpl._model.loss
+    assert dpl._criterion.id == criterion.id
+    assert dpl._optimizer.id == optimizer.id
 
 
 def test_train_wrong_data():
     model = Mock()
     layer = Mock
+    criterion = Mock()
+    optimizer = Mock()
+    metrics = Mock()
 
     sizes = [(30, 24, 24), (24, 10)]
 
@@ -74,7 +67,7 @@ def test_train_wrong_data():
 
     batch = 32
     epoch = 2
-    kdpl = DeepLearningModel(model, batch, epoch)
+    kdpl = DeepLearningModel(model, criterion, optimizer, batch, epoch, metrics)
 
     num_data = 30
     data = np.array([np.random.rand(16, 16) for i in range(num_data)])
@@ -96,6 +89,9 @@ def test_train_wrong_data():
 def test_keras_model_train():
     model = Mock()
     layer = Mock
+    criterion = Mock()
+    optimizer = Mock()
+    metrics = Mock()
 
     sizes = [(1, 24, 24), (24, 10)]
 
@@ -107,7 +103,7 @@ def test_keras_model_train():
 
     batch = 32
     epoch = 2
-    kdpm = DeepLearningModel(model, batch, epoch)
+    kdpm = DeepLearningModel(model, criterion, optimizer, batch, epoch, metrics)
 
     num_data = 30
     data = np.array([np.random.rand(24, 24) for i in range(num_data)])
@@ -129,6 +125,9 @@ def test_keras_model_train():
 def test_evaluate():
     model = Mock()
     layer = Mock
+    criterion = Mock()
+    optimizer = Mock()
+    metrics = Mock()
 
     sizes = [(1, 24, 24), (24, 10)]
 
@@ -140,7 +139,7 @@ def test_evaluate():
 
     batch = 32
     epoch = 2
-    kdpm = DeepLearningModel(model, batch, epoch)
+    kdpm = DeepLearningModel(model, criterion, optimizer, batch, epoch, metrics)
 
     num_data = 30
     data = np.array([np.random.rand(24, 24) for i in range(num_data)])
@@ -156,6 +155,9 @@ def test_evaluate():
 def test_predict():
     model = Mock()
     layer = Mock
+    criterion = Mock()
+    optimizer = Mock()
+    metrics = Mock()
 
     sizes = [(1, 24, 24), (24, 10)]
 
@@ -167,7 +169,7 @@ def test_predict():
 
     batch = 32
     epoch = 2
-    kdpm = DeepLearningModel(model, batch, epoch)
+    kdpm = DeepLearningModel(model, criterion, optimizer, batch, epoch, metrics)
 
     num_data = 30
     data = np.array([np.random.rand(24, 24) for i in range(num_data)])
@@ -180,6 +182,9 @@ def test_predict():
 def test_wrong_predict():
     model = Mock()
     layer = Mock
+    criterion = Mock()
+    optimizer = Mock()
+    metrics = Mock()
 
     sizes = [(1, 24, 24), (24, 10)]
 
@@ -191,7 +196,7 @@ def test_wrong_predict():
 
     batch = 32
     epoch = 2
-    kdpm = DeepLearningModel(model, batch, epoch)
+    kdpm = DeepLearningModel(model, criterion, optimizer, batch, epoch, metrics)
 
     num_data = 30
     data = np.array([np.random.rand(16, 16) for i in range(num_data)])
