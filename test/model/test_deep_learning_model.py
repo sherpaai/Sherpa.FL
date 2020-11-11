@@ -208,6 +208,9 @@ def test_wrong_predict():
 def test_get_model_params():
     model = Mock()
     layer = Mock
+    criterion = Mock()
+    optimizer = Mock()
+    metrics = Mock()
 
     num_data = 30
     sizes = [(1, 24, 24), (24, num_data)]
@@ -220,7 +223,7 @@ def test_get_model_params():
 
     batch = 32
     epoch = 2
-    kdpm = DeepLearningModel(model, batch, epoch)
+    kdpm = DeepLearningModel(model, criterion, optimizer, batch, epoch, metrics)
 
     params = np.random.rand(30)
     kdpm._model.get_weights.return_value = params
@@ -232,6 +235,9 @@ def test_get_model_params():
 def test_set_weights():
     model = Mock()
     layer = Mock
+    criterion = Mock()
+    optimizer = Mock()
+    metrics = Mock()
 
     num_data = 30
     sizes = [(1, 24, 24), (24, num_data)]
@@ -244,7 +250,7 @@ def test_set_weights():
 
     batch = 32
     epoch = 2
-    kdpm = DeepLearningModel(model, batch, epoch)
+    kdpm = DeepLearningModel(model, criterion, optimizer, batch, epoch, metrics)
 
     params = np.random.rand(30)
     kdpm.set_model_params(params)
@@ -255,6 +261,9 @@ def test_set_weights():
 def test_performance():
     model = Mock()
     layer = Mock
+    criterion = Mock()
+    optimizer = Mock()
+    metrics = Mock()
 
     num_data = 30
     sizes = [(1, 24, 24), (24, num_data)]
@@ -269,7 +278,7 @@ def test_performance():
 
     batch = 32
     epoch = 2
-    kdpm = DeepLearningModel(model, batch, epoch)
+    kdpm = DeepLearningModel(model, criterion, optimizer, batch, epoch, metrics)
 
     kdpm._check_data = Mock()
     kdpm._check_labels = Mock()
