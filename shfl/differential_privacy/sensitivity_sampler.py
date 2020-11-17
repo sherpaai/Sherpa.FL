@@ -3,6 +3,7 @@ from scipy import special
 from math import pow
 from multipledispatch import dispatch
 from multipledispatch.variadic import Variadic
+import copy
 
 
 class SensitivitySampler:
@@ -57,22 +58,37 @@ class SensitivitySampler:
                 (see: [Norm](../norm))
             oracle: ProbabilityDistribution to sample.
             n: int for size of private data
-            m: int for size of sampling
+            m: int for number of sensitivity samples
             k: element which contains the highest sampled value
 
         # Returns:
             a tuple with the sampled sensitivity and the mean of the sampled sensitivities
         """
         gs = [np.inf for i in range(m)]
-
+        
         for i in range(0, m):
             db1 = oracle.sample(n - 1)
             db2 = db1
-            db1 = np.concatenate((db1, oracle.sample(1)))
-            db2 = np.concatenate((db2, oracle.sample(1)))
+            db1 = self._concatenate(db1, oracle.sample(1))
+            db2 = self._concatenate(db2, oracle.sample(1))
             gs[i] = self._sensitivity_norm(query, sensitivity_norm, db1, db2)
-
+            
         return self._sort_sensitivity(*gs, k=k)
+    
+    @staticmethod
+    def _seq_iter(obj):
+        return obj if isinstance(obj, dict) else range(len(obj))
+    
+    @dispatch((np.ScalarType, np.ndarray), (np.ScalarType, np.ndarray))
+    def _concatenate(self, x_1, x_2):
+        return np.concatenate((x_1, x_2))
+    
+    @dispatch((list, dict), (list, dict))
+    def _concatenate(self, x_1, x_2):
+        output = copy.deepcopy(x_1)
+        for i, j in zip(self._seq_iter(x_1), self._seq_iter(x_2)):
+            output[i] = self._concatenate(x_1[i], x_2[j])
+        return output
 
     @dispatch(Variadic[(np.ndarray, list)])
     def _sort_sensitivity(self, *gs, k):
@@ -145,3 +161,5 @@ class SensitivitySampler:
                 k = np.ceil(m * (1 - gamma + gamma_lo))
 
         return {'m': m, 'gamma': gamma, 'k': k, 'rho': rho}
+    
+    

@@ -2,6 +2,7 @@ import numpy as np
 
 from shfl.private.query import Mean
 from shfl.private.query import Query
+from shfl.private.query import IdentityFunction
 from shfl.differential_privacy.probability_distribution import NormalDistribution
 from shfl.differential_privacy import SensitivitySampler
 from shfl.differential_privacy import L1SensitivityNorm
@@ -71,3 +72,37 @@ def test_sensitivity_norm_list_of_arrays():
     for i in range(len(s_max)):
         assert s_max[i].sum() < 2 * 1.5
         assert s_mean[i].sum() < 2 * 1.5
+
+
+def test_concatenate_overload_lists_of_arrays():
+    list_a = [np.random.rand(30, 40),
+              np.random.rand(20, 50),
+              np.random.rand(60, 80)]
+
+    list_b = [np.random.rand(1, 40),
+              np.random.rand(1, 50),
+              np.random.rand(1, 80)]
+
+    sampler = SensitivitySampler()
+    concatenated_list = sampler._concatenate(list_a, list_b)
+    for array_i, array_j, array_k in zip(list_a, list_b, concatenated_list):
+        assert array_k.shape[0] == array_i.shape[0] + array_j.shape[0]
+        assert array_k.shape[1] == array_i.shape[1] == array_j.shape[1]
+
+
+def test_concatenate_overload_dictionary_of_arrays():
+    dict_a = {1: np.random.rand(30, 40),
+              2: np.random.rand(20, 50),
+              3: np.random.rand(60, 80)}
+
+    dict_b = {3: np.random.rand(1, 40),
+              4: np.random.rand(1, 50),
+              5: np.random.rand(1, 80)}
+
+    sampler = SensitivitySampler()
+    concatenated_dict = sampler._concatenate(dict_a, dict_b)
+    for i, j, k in zip(dict_a, dict_b, concatenated_dict):
+        assert concatenated_dict[k].shape[0] == \
+               dict_a[i].shape[0] + dict_b[j].shape[0]
+        assert concatenated_dict[k].shape[1] == \
+               dict_a[i].shape[1] == dict_b[j].shape[1]
